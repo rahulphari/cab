@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CabSight</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Utilities */
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: white; -webkit-tap-highlight-color: transparent; }
+        .hide { display: none !important; }
+        .show { display: block !important; }
+        .bilingual-sub { font-size: 0.8em; opacity: 0.7; display: block; font-weight: normal; }
+        
+        /* Smooth transitions for views */
+        .view-section { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Loader */
+        .loader { border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top: 3px solid #22d3ee; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* PIN Input styling */
+        .pin-dots { letter-spacing: 0.5em; text-align: center; font-size: 2em; -webkit-text-security: disc; }
+    </style>
+</head>
+<body>
+
+    <!-- APP CONTAINER -->
+    <div id="app-container" class="max-w-md mx-auto min-h-screen bg-slate-950 relative pb-20 shadow-2xl overflow-hidden">
+        
+        <!-- NOTIFICATION TOAST -->
+        <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl border border-slate-700 z-50 transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-cyan-400"></i>
+            <span id="toast-msg" class="text-sm font-bold">Notification</span>
+        </div>
+
+        <!-- LOADING SCREEN -->
+        <div id="loading-view" class="view-section h-screen flex flex-col items-center justify-center text-center p-6">
+            <h1 class="text-4xl font-black mb-4">Cab<span class="text-cyan-400">Sight</span></h1>
+            <div class="loader mb-4"></div>
+            <p class="text-slate-400 text-sm">Initializing Satellite Uplink...<br><span class="bilingual-sub">ಸಿಸ್ಟಮ್ ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ...</span></p>
+            <p id="loading-error" class="text-red-400 text-xs mt-4 hide">Connection taking too long...</p>
+        </div>
+
+        <!-- AUTH ROLE SELECTION VIEW -->
+        <div id="auth-view" class="view-section hide h-screen flex flex-col items-center justify-center p-6 space-y-6">
+            <div class="text-center mb-8">
+                <h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1>
+                <p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p>
+            </div>
+
+            <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95">
+                <div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400"><i data-lucide="car"></i></div>
+                <div class="text-left">
+                    <h3 class="font-bold text-lg">Driver Login</h3>
+                    <span class="bilingual-sub">ಚಾಲಕರ ಲಾಗಿನ್</span>
+                </div>
+            </button>
+
+            <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95">
+                <div class="bg-purple-900/30 p-3 rounded-full text-purple-400"><i data-lucide="users"></i></div>
+                <div class="text-left">
+                    <h3 class="font-bold text-lg">Employee Login</h3>
+                    <span class="bilingual-sub">ಉದ್ಯೋಗಿ ಲಾಗಿನ್</span>
+                </div>
+            </button>
+
+            <div class="w-full h-px bg-slate-800 my-4"></div>
+
+            <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2">
+                <i data-lucide="user-plus"></i> New User / ಹೊಸ ಬಳಕೆದಾರ
+            </button>
+            
+            <button onclick="window.app.selectLoginRole('admin')" class="text-xs text-slate-600 mt-4">Admin Access / ನಿರ್ವಾಹಕರು</button>
+        </div>
+
+        <!-- NEW: LOGIN & PIN VIEW -->
+        <div id="login-form-view" class="view-section hide h-screen flex flex-col justify-center p-6 bg-slate-950">
+            <button onclick="window.app.showAuth()" class="absolute top-6 left-6 p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><i data-lucide="arrow-left"></i></button>
+            
+            <div class="text-center mb-8">
+                <div id="login-icon-container" class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4 text-cyan-400">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h2 id="login-title" class="text-2xl font-bold">Login</h2>
+                <p class="text-slate-400 text-sm">Enter Credentials / ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ</p>
+                <!-- Hint for demo -->
+                <p class="text-[10px] text-slate-600 mt-2 bg-slate-900 inline-block px-2 py-1 rounded">Demo PIN: 1234</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase font-bold ml-1">Phone Number / ID</label>
+                    <input type="text" id="login-id" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-lg focus:border-cyan-500 outline-none" placeholder="Enter ID">
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase font-bold ml-1">4-Digit PIN</label>
+                    <input type="password" id="login-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••">
+                </div>
+
+                <button onclick="window.app.submitLogin()" id="btn-login-submit" class="w-full bg-cyan-600 text-black font-bold p-4 rounded-xl shadow-lg mt-6 flex justify-center items-center gap-2">
+                    <i data-lucide="log-in"></i> Secure Login
+                </button>
+            </div>
+        </div>
+
+        <!-- ONBOARDING VIEW -->
+        <div id="onboarding-view" class="view-section hide h-screen p-6 bg-slate-900 flex flex-col justify-center">
+            <h2 class="text-2xl font-bold mb-6">Setup Profile <span class="bilingual-sub">ಪ್ರೊಫೈಲ್ ರಚಿಸಿ</span></h2>
+            
+            <div class="space-y-4 overflow-y-auto max-h-[80vh] pb-10">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Full Name / ಪೂರ್ಣ ಹೆಸರು</label>
+                    <input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. Raju Kumar">
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Phone (Login ID) / ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label>
+                    <input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. 9876543210">
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN / ಪಿನ್ ಸೆಟ್ ಮಾಡಿ</label>
+                    <input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••">
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Role / ಪಾತ್ರ</label>
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <button onclick="window.app.selectRegRole('driver')" id="btn-role-driver" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2">
+                            <i data-lucide="car"></i> Driver
+                        </button>
+                        <button onclick="window.app.selectRegRole('employee')" id="btn-role-employee" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2">
+                            <i data-lucide="briefcase"></i> Employee
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Driver Specific -->
+                <div id="reg-driver-fields" class="hide space-y-4">
+                    <input type="text" id="reg-vehicle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Vehicle Model (e.g. Innova)">
+                    <input type="text" id="reg-plate" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Plate No (e.g. KA-01-AB-1234)">
+                </div>
+
+                <!-- Employee Specific -->
+                <div id="reg-employee-fields" class="hide">
+                    <select id="reg-dept" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none">
+                        <option value="">Select Department / ಇಲಾಖೆ</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="HR">HR</option>
+                        <option value="Sales">Sales</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button onclick="window.app.showAuth()" class="flex-1 p-4 rounded-xl bg-slate-800 text-slate-400 font-bold">Cancel</button>
+                    <button onclick="window.app.completeRegistration()" class="flex-[2] p-4 rounded-xl bg-cyan-600 text-black font-bold shadow-lg shadow-cyan-900/50">Save & Login</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRIVER DASHBOARD -->
+        <div id="driver-view" class="view-section hide min-h-screen bg-black pb-24">
+            <!-- Header -->
+            <header class="bg-slate-900 p-4 sticky top-0 z-20 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div id="d-avatar" class="w-10 h-10 rounded-full bg-cyan-900 border border-cyan-500 flex items-center justify-center font-bold text-cyan-400">D</div>
+                    <div>
+                        <h2 id="d-name" class="font-bold text-sm">Driver</h2>
+                        <p id="d-vehicle" class="text-xs text-slate-400">Vehicle</p>
+                    </div>
+                </div>
+                <button onclick="window.app.logout()" class="bg-slate-800 p-2 rounded-full"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+            </header>
+
+            <div class="p-4 space-y-6">
+                <!-- IDLE STATE -->
+                <div id="driver-idle" class="space-y-6">
+                    <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-center">
+                        <h2 class="text-xl font-bold mb-1">Start New Shift</h2>
+                        <span class="bilingual-sub mb-6">ಹೊಸ ಶಿಫ್ಟ್ ಪ್ರಾರಂಭಿಸಿ</span>
+                        
+                        <div class="space-y-4 text-left">
+                            <div>
+                                <label class="text-xs text-slate-400">START ODOMETER / ಆರಂಭಿಕ ರೀಡಿಂಗ್</label>
+                                <input type="number" id="start-odo" class="w-full bg-slate-800 rounded-xl p-3 text-2xl font-mono border border-slate-700 focus:border-cyan-500 outline-none" placeholder="00000">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="window.app.capturePhoto()" id="btn-photo" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
+                                    <i data-lucide="camera"></i>
+                                    <span class="text-xs">Photo</span>
+                                </button>
+                                <div id="gps-status" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500">
+                                    <i data-lucide="crosshair"></i>
+                                    <span class="text-xs">GPS Wait</span>
+                                </div>
+                            </div>
+
+                            <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="window.app.handlePhotoInput(this)">
+                        </div>
+
+                        <button onclick="window.app.startTrip()" id="btn-start-trip" class="w-full mt-6 bg-slate-800 text-slate-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all" disabled>
+                            <i data-lucide="navigation"></i> START DUTY
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ACTIVE STATE -->
+                <div id="driver-active" class="hide space-y-6">
+                    <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 border border-emerald-800 relative overflow-hidden shadow-xl">
+                        <div class="absolute top-4 right-4 animate-pulse"><div class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]"></div></div>
+                        <span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE / ಚಾಲನೆಯಲ್ಲಿದೆ</span>
+                        <h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00</h1>
+                        <p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> Locating...</p>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800">
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-800">
+                            <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
+                            <span class="text-sm font-bold text-slate-300">Live Timeline <span class="bilingual-sub inline ml-2">ಟೈಮ್‌ಲೈನ್</span></span>
+                        </div>
+                        <div id="trip-timeline" class="space-y-4 pl-2 border-l border-slate-800 ml-2">
+                            <!-- Timeline items injected here -->
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800">
+                        <label class="text-xs text-slate-400">END ODOMETER / ಅಂತಿಮ ರೀಡಿಂಗ್</label>
+                        <div class="flex gap-3 mt-2">
+                            <input type="number" id="end-odo" class="flex-1 bg-slate-800 rounded-xl p-3 text-xl font-mono border border-slate-700 outline-none" placeholder="00000">
+                            <button onclick="window.app.endTrip()" class="bg-red-600 px-6 rounded-xl text-white shadow-lg active:scale-95"><i data-lucide="check-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPLOYEE DASHBOARD -->
+        <div id="employee-view" class="view-section hide min-h-screen bg-slate-50 text-slate-900">
+            <nav class="bg-white shadow-sm p-4 sticky top-0 z-20 flex justify-between items-center">
+                <div>
+                    <h2 class="font-bold text-blue-600">Commute<span class="text-slate-400">Sync</span></h2>
+                    <span class="text-[10px] text-slate-400 block">Employee App / ಉದ್ಯೋಗಿ</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="e-name" class="text-sm font-bold text-slate-700 hidden md:block">User</span>
+                    <button onclick="window.app.logout()" class="bg-slate-100 p-2 rounded-full text-slate-600"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+                </div>
+            </nav>
+
+            <div class="p-4 space-y-6 max-w-lg mx-auto">
+                <!-- NOT ONBOARD -->
+                <div id="employee-idle" class="space-y-4">
+                    <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2"><i data-lucide="rss" class="w-4 h-4"></i> Nearby Cabs <span class="bilingual-sub font-normal text-xs ml-1">(ಹತ್ತಿರದ ಕ್ಯಾಬ್‌ಗಳು)</span></h3>
+                    <div id="cab-list" class="space-y-3 pb-20">
+                        <!-- Cabs injected here -->
+                        <div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-200">
+                            <i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-30"></i>
+                            <p>No active cabs nearby.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ONBOARD -->
+                <div id="employee-onboard" class="hide">
+                    <div class="bg-blue-600 text-white rounded-3xl p-6 shadow-xl shadow-blue-200">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-blue-200 text-xs font-bold mb-1 uppercase">ONBOARD / ಮಂಡಳಿಯಲ್ಲಿ</p>
+                                <h2 id="onboard-driver" class="text-2xl font-bold">Driver Name</h2>
+                                <p id="onboard-vehicle" class="opacity-90 text-sm font-mono">Vehicle</p>
+                            </div>
+                            <div class="bg-white/20 p-3 rounded-2xl"><i data-lucide="car" class="w-6 h-6 text-white"></i></div>
+                        </div>
+                        
+                        <div class="bg-white/10 rounded-xl p-3 mb-4 backdrop-blur-sm">
+                            <div class="flex items-center gap-2 text-sm text-blue-100">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                <span id="onboard-loc">Boarded at...</span>
+                            </div>
+                        </div>
+
+                        <button onclick="window.app.leaveTrip()" id="btn-leave" class="w-full bg-white text-blue-600 py-4 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95">
+                            <i data-lucide="map-pin"></i> Drop / Leave <span class="bilingual-sub text-[10px] text-blue-400 font-normal">ಇಳಿಯಿರಿ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="admin-view" class="view-section hide min-h-screen bg-slate-100 text-slate-900">
+            <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 flex justify-between items-center shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500 p-2 rounded-lg"><i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i></div>
+                    <div>
+                        <h2 class="font-bold text-sm">Tower Control</h2>
+                        <span class="text-[10px] text-slate-400 block">Admin Panel</span>
+                    </div>
+                </div>
+                <button onclick="window.app.logout()" class="text-slate-400"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="p-4 overflow-y-auto pb-20">
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-[10px] text-slate-400 font-bold">TOTAL KMS</p>
+                        <p id="stats-km" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-[10px] text-slate-400 font-bold">ACTIVE FLEET</p>
+                        <p id="stats-active" class="text-2xl font-black text-emerald-600">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
+                    <div class="p-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-700">Trip Logs</h3>
+                        <button onclick="window.app.downloadCSV()" class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold flex gap-1 items-center">
+                            <i data-lucide="download" class="w-3 h-3"></i> CSV
+                        </button>
+                    </div>
+                    <div id="admin-list" class="divide-y divide-slate-100">
+                        <!-- Logs injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, arrayUnion, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAavAKTlUPdr9kFLZPdqQf2mAZ_c5kLsG4",
+            authDomain: "cabsight.firebaseapp.com",
+            projectId: "cabsight",
+            storageBucket: "cabsight.firebasestorage.app",
+            messagingSenderId: "880698217100",
+            appId: "1:880698217100:web:02d727fbafd4fc6a5161a9"
+        };
+        const appId = 'cabsight';
+
+        // Initialize Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // --- GLOBAL STATE ---
+        const state = {
+            user: null, 
+            trips: [],
+            gps: null,
+            photo: null,
+            activeTrip: null,
+            myTrip: null,
+            loginRole: null // currently selected role for login
+        };
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            views: ['loading-view', 'auth-view', 'login-form-view', 'onboarding-view', 'driver-view', 'employee-view', 'admin-view'],
+            toast: document.getElementById('toast'),
+            toastMsg: document.getElementById('toast-msg'),
+            regName: document.getElementById('reg-name'),
+            regPhone: document.getElementById('reg-phone'),
+            regPin: document.getElementById('reg-pin'),
+            regVehicle: document.getElementById('reg-vehicle'),
+            regPlate: document.getElementById('reg-plate'),
+            regDept: document.getElementById('reg-dept'),
+            loginId: document.getElementById('login-id'),
+            loginPin: document.getElementById('login-pin'),
+            driverFields: document.getElementById('reg-driver-fields'),
+            empFields: document.getElementById('reg-employee-fields'),
+            btnRoleDriver: document.getElementById('btn-role-driver'),
+            btnRoleEmp: document.getElementById('btn-role-employee'),
+            cabList: document.getElementById('cab-list'),
+            adminList: document.getElementById('admin-list'),
+            tripTimeline: document.getElementById('trip-timeline')
+        };
+
+        // --- APP LOGIC ---
+        window.app = {
+            // Navigation
+            showView: (viewId) => {
+                els.views.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(id === viewId) {
+                        el.classList.remove('hide');
+                        // Trigger Lucide icons refresh
+                        lucide.createIcons();
+                    } else {
+                        el.classList.add('hide');
+                    }
+                });
+            },
+
+            showToast: (msg) => {
+                els.toastMsg.innerText = msg;
+                els.toast.classList.remove('opacity-0');
+                els.toast.classList.remove('pointer-events-none');
+                setTimeout(() => {
+                    els.toast.classList.add('opacity-0');
+                    els.toast.classList.add('pointer-events-none');
+                }, 3000);
+            },
+
+            // --- AUTHENTICATION & LOGIN ---
+            
+            showAuth: () => window.app.showView('auth-view'),
+
+            selectLoginRole: (role) => {
+                state.loginRole = role;
+                // Update Login UI based on role
+                const title = document.getElementById('login-title');
+                const iconContainer = document.getElementById('login-icon-container');
+                
+                if(role === 'driver') {
+                    title.innerText = "Driver Login";
+                    iconContainer.className = "w-16 h-16 rounded-full bg-cyan-900/30 flex items-center justify-center mx-auto mb-4 text-cyan-400";
+                    iconContainer.innerHTML = `<i data-lucide="car" class="w-8 h-8"></i>`;
+                } else if(role === 'employee') {
+                    title.innerText = "Employee Login";
+                    iconContainer.className = "w-16 h-16 rounded-full bg-purple-900/30 flex items-center justify-center mx-auto mb-4 text-purple-400";
+                    iconContainer.innerHTML = `<i data-lucide="users" class="w-8 h-8"></i>`;
+                } else {
+                    title.innerText = "Admin Access";
+                    iconContainer.className = "w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-400";
+                    iconContainer.innerHTML = `<i data-lucide="shield" class="w-8 h-8"></i>`;
+                }
+
+                els.loginId.value = '';
+                els.loginPin.value = '';
+                window.app.showView('login-form-view');
+            },
+
+            submitLogin: async () => {
+                const id = els.loginId.value.trim();
+                const pin = els.loginPin.value.trim();
+                const btn = document.getElementById('btn-login-submit');
+
+                if(!id || !pin) return window.app.showToast("Please enter ID and PIN");
+
+                btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Verifying...`;
+                lucide.createIcons();
+
+                // 1. Check Hardcoded Demo Users First
+                let user = null;
+                if(state.loginRole === 'driver' && id === 'driver' && pin === '1234') {
+                    user = { id: 'd1', name: 'Ramesh Driver', role: 'driver', vehicle: 'Innova KA-01' };
+                } else if(state.loginRole === 'employee' && id === 'employee' && pin === '1234') {
+                    user = { id: 'e1', name: 'John Emp', role: 'employee', dept: 'Engineering' };
+                } else if(state.loginRole === 'admin' && id === 'admin' && pin === '1234') {
+                    user = { id: 'admin', name: 'Admin', role: 'admin' };
+                }
+
+                // 2. If not found, check Firestore 'users' collection
+                if (!user) {
+                    try {
+                        const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                        const q = query(usersRef, where("phone", "==", id), where("pin", "==", pin), where("role", "==", state.loginRole));
+                        const snapshot = await getDocs(q);
+                        
+                        if (!snapshot.empty) {
+                            const doc = snapshot.docs[0];
+                            user = { id: doc.id, ...doc.data() };
+                        }
+                    } catch (e) {
+                        console.error("Login Query Error:", e);
+                    }
+                }
+
+                btn.innerHTML = `<i data-lucide="log-in"></i> Secure Login`;
+                lucide.createIcons();
+
+                if(user) {
+                    state.user = user;
+                    window.app.showToast(`Welcome back, ${user.name}`);
+                    window.app.routeUser();
+                } else {
+                    window.app.showToast("Invalid Credentials");
+                }
+            },
+            
+            logout: () => {
+                state.user = null;
+                window.app.showView('auth-view');
+            },
+
+            // --- REGISTRATION ---
+            
+            showOnboarding: () => {
+                state.regRole = 'employee'; // default
+                window.app.updateRegUI();
+                window.app.showView('onboarding-view');
+            },
+
+            selectRegRole: (role) => {
+                state.regRole = role;
+                window.app.updateRegUI();
+            },
+
+            updateRegUI: () => {
+                if(state.regRole === 'driver') {
+                    els.driverFields.classList.remove('hide');
+                    els.empFields.classList.add('hide');
+                    els.btnRoleDriver.classList.add('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20');
+                    els.btnRoleEmp.classList.remove('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20');
+                } else {
+                    els.driverFields.classList.add('hide');
+                    els.empFields.classList.remove('hide');
+                    els.btnRoleEmp.classList.add('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20');
+                    els.btnRoleDriver.classList.remove('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20');
+                }
+            },
+
+            completeRegistration: async () => {
+                const name = els.regName.value;
+                const phone = els.regPhone.value;
+                const pin = els.regPin.value;
+
+                if(!name || !phone || !pin) return window.app.showToast("All fields required");
+                if(pin.length !== 4) return window.app.showToast("PIN must be 4 digits");
+                
+                const userData = {
+                    name: name,
+                    phone: phone,
+                    pin: pin,
+                    role: state.regRole,
+                    vehicle: els.regVehicle.value || '',
+                    plate: els.regPlate.value || '',
+                    dept: els.regDept.value || '',
+                    createdAt: new Date().toISOString()
+                };
+
+                // Save to Firestore so login works
+                try {
+                    const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), userData);
+                    state.user = { id: docRef.id, ...userData };
+                    window.app.showToast("Registration Complete");
+                    window.app.routeUser();
+                } catch(e) {
+                    console.error(e);
+                    window.app.showToast("Registration Failed");
+                }
+            },
+
+            routeUser: () => {
+                if(!state.user) return window.app.showView('auth-view');
+                if(state.user.role === 'driver') {
+                    document.getElementById('d-name').innerText = state.user.name;
+                    document.getElementById('d-vehicle').innerText = state.user.vehicle || 'Vehicle';
+                    window.app.showView('driver-view');
+                    window.app.renderDriverState();
+                } else if(state.user.role === 'employee') {
+                    document.getElementById('e-name').innerText = state.user.name;
+                    window.app.showView('employee-view');
+                    window.app.renderEmployeeState();
+                } else {
+                    window.app.showView('admin-view');
+                    window.app.renderAdminState();
+                }
+            },
+
+            // DRIVER LOGIC
+            capturePhoto: () => {
+                document.getElementById('camera-input').click();
+            },
+
+            handlePhotoInput: (input) => {
+                if(input.files && input.files[0]) {
+                    state.photo = input.files[0]; // In real app, upload this
+                    const btn = document.getElementById('btn-photo');
+                    btn.classList.add('border-emerald-500', 'text-emerald-500');
+                    btn.innerHTML = `<i data-lucide="check"></i> Photo OK`;
+                    lucide.createIcons();
+                    window.app.getGPSLocation();
+                }
+            },
+
+            getGPSLocation: () => {
+                const status = document.getElementById('gps-status');
+                status.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Finding...`;
+                lucide.createIcons();
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        state.gps = {
+                            lat: position.coords.latitude.toFixed(5),
+                            lng: position.coords.longitude.toFixed(5),
+                            timestamp: new Date().toISOString()
+                        };
+                        status.classList.add('border-emerald-500', 'text-emerald-500');
+                        status.innerHTML = `<i data-lucide="map-pin"></i> GPS OK`;
+                        lucide.createIcons();
+                        window.app.checkStartButton();
+                    }, () => {
+                        status.innerHTML = "GPS Failed";
+                        alert("GPS Permission Denied");
+                    });
+                } else {
+                    alert("GPS not supported");
+                }
+            },
+
+            checkStartButton: () => {
+                const odo = document.getElementById('start-odo').value;
+                const btn = document.getElementById('btn-start-trip');
+                if(odo && state.photo && state.gps) {
+                    btn.disabled = false;
+                    btn.classList.remove('bg-slate-800', 'text-slate-500');
+                    btn.classList.add('bg-cyan-600', 'text-black', 'shadow-lg');
+                }
+            },
+
+            startTrip: async () => {
+                const odo = document.getElementById('start-odo').value;
+                if(!odo || !state.gps) return;
+
+                const tripData = {
+                    driverId: state.user.id,
+                    driverName: state.user.name,
+                    vehicle: state.user.vehicle,
+                    startTime: new Date().toISOString(),
+                    startOdo: parseInt(odo),
+                    startLocation: `${state.gps.lat}, ${state.gps.lng}`,
+                    status: 'active',
+                    passengers: [],
+                    stops: [{
+                        type: 'start',
+                        time: new Date().toISOString(),
+                        lat: state.gps.lat,
+                        lng: state.gps.lng,
+                        desc: 'Shift Started'
+                    }]
+                };
+
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), tripData);
+                window.app.showToast("Shift Started! Drive Safe.");
+            },
+
+            endTrip: async () => {
+                const odo = document.getElementById('end-odo').value;
+                if(!state.activeTrip || !odo) return alert("Enter End Odometer");
+                if(parseInt(odo) <= state.activeTrip.startOdo) return alert("End Odo must be > Start Odo");
+
+                const tripRef = doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id);
+                await updateDoc(tripRef, {
+                    endTime: new Date().toISOString(),
+                    endOdo: parseInt(odo),
+                    status: 'completed',
+                    totalKm: parseInt(odo) - state.activeTrip.startOdo,
+                    stops: arrayUnion({
+                        type: 'end',
+                        time: new Date().toISOString(),
+                        desc: 'Shift Ended'
+                    })
+                });
+                
+                // Reset UI
+                state.photo = null;
+                state.gps = null;
+                document.getElementById('start-odo').value = '';
+                document.getElementById('end-odo').value = '';
+                document.getElementById('btn-photo').innerHTML = `<i data-lucide="camera"></i> <span class="text-xs">Photo</span>`;
+                document.getElementById('btn-photo').className = "p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400";
+                document.getElementById('gps-status').innerHTML = `<i data-lucide="crosshair"></i> <span class="text-xs">GPS Wait</span>`;
+                document.getElementById('gps-status').className = "p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500";
+                window.app.showToast("Shift Ended. Data Synced.");
+            },
+
+            renderDriverState: () => {
+                const active = state.trips.find(t => t.driverId === state.user.id && t.status === 'active');
+                state.activeTrip = active;
+
+                if(active) {
+                    document.getElementById('driver-idle').classList.add('hide');
+                    document.getElementById('driver-active').classList.remove('hide');
+                    document.getElementById('trip-start-loc').innerHTML = `<i data-lucide="map-pin" class="w-3 h-3"></i> ${active.startLocation}`;
+                    
+                    // Render Timeline
+                    els.tripTimeline.innerHTML = active.stops.map(stop => `
+                        <div class="relative flex gap-3 pb-2">
+                            <div class="w-2 h-2 mt-1.5 rounded-full ${stop.type==='start'?'bg-cyan-500':stop.type==='pickup'?'bg-purple-500':'bg-orange-500'}"></div>
+                            <div>
+                                <p class="text-xs text-slate-300 font-bold">${stop.desc}</p>
+                                <p class="text-[10px] text-slate-500 font-mono">${new Date(stop.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('driver-idle').classList.remove('hide');
+                    document.getElementById('driver-active').classList.add('hide');
+                }
+                lucide.createIcons();
+            },
+
+            // EMPLOYEE LOGIC
+            joinTrip: async (tripId) => {
+                const btn = document.getElementById(`btn-join-${tripId}`);
+                if(btn) btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Joining...`;
+
+                // Quick GPS for boarding
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const lat = pos.coords.latitude.toFixed(5);
+                    const lng = pos.coords.longitude.toFixed(5);
+                    
+                    const trip = state.trips.find(t => t.id === tripId);
+                    const newPassengers = [...(trip.passengers || []), { id: state.user.id, name: state.user.name }];
+                    
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), {
+                        passengers: newPassengers,
+                        stops: arrayUnion({
+                            type: 'pickup',
+                            time: new Date().toISOString(),
+                            lat: lat, lng: lng,
+                            desc: `Pickup: ${state.user.name}`
+                        })
+                    });
+                });
+            },
+
+            leaveTrip: async () => {
+                const btn = document.getElementById('btn-leave');
+                btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Leaving...`;
+                
+                if(!state.myTrip) return;
+                
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                     const lat = pos.coords.latitude.toFixed(5);
+                     const lng = pos.coords.longitude.toFixed(5);
+
+                     const newPassengers = state.myTrip.passengers.filter(p => p.id !== state.user.id);
+                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.myTrip.id), {
+                        passengers: newPassengers,
+                        stops: arrayUnion({
+                            type: 'drop',
+                            time: new Date().toISOString(),
+                            lat: lat, lng: lng,
+                            desc: `Drop: ${state.user.name}`
+                        })
+                     });
+                });
+            },
+
+            renderEmployeeState: () => {
+                const myTrip = state.trips.find(t => t.status === 'active' && t.passengers?.some(p => p.id === state.user.id));
+                state.myTrip = myTrip;
+                
+                if(myTrip) {
+                    document.getElementById('employee-idle').classList.add('hide');
+                    document.getElementById('employee-onboard').classList.remove('hide');
+                    document.getElementById('onboard-driver').innerText = myTrip.driverName;
+                    document.getElementById('onboard-vehicle').innerText = myTrip.vehicle;
+                    document.getElementById('onboard-loc').innerText = `Started at ${myTrip.startLocation}`;
+                } else {
+                    document.getElementById('employee-idle').classList.remove('hide');
+                    document.getElementById('employee-onboard').classList.add('hide');
+                    
+                    const activeTrips = state.trips.filter(t => t.status === 'active');
+                    if(activeTrips.length === 0) {
+                        els.cabList.innerHTML = `<div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-200"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-30"></i><p>No active cabs nearby.</p></div>`;
+                    } else {
+                        els.cabList.innerHTML = activeTrips.map(t => `
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <div><h3 class="font-bold text-lg text-slate-800">${t.driverName}</h3><p class="text-slate-500 text-sm">${t.vehicle}</p></div>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">${t.passengers?.length || 0} PAX</span>
+                                </div>
+                                <button id="btn-join-${t.id}" onclick="window.app.joinTrip('${t.id}')" class="w-full bg-slate-900 text-white py-3 rounded-xl flex justify-center items-center gap-2 shadow-md active:scale-95">
+                                    <i data-lucide="navigation" class="w-4 h-4"></i> Join Ride
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                }
+                lucide.createIcons();
+            },
+
+            // ADMIN LOGIC
+            renderAdminState: () => {
+                let totalKm = 0;
+                let activeCount = 0;
+                
+                const rows = state.trips.map(t => {
+                    if(t.status === 'completed') totalKm += (t.totalKm || 0);
+                    if(t.status === 'active') activeCount++;
+
+                    return `
+                        <div class="p-4 flex flex-col gap-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-sm text-slate-800">${t.driverName}</span>
+                                <span class="text-[10px] px-2 py-1 rounded ${t.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'} uppercase font-bold">${t.status}</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-500">
+                                <span>${t.vehicle}</span>
+                                <span class="font-mono">${t.totalKm ? t.totalKm + ' km' : '-'}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400 font-mono mt-1">
+                                ${new Date(t.startTime).toLocaleString()}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('stats-km').innerText = totalKm;
+                document.getElementById('stats-active').innerText = activeCount;
+                els.adminList.innerHTML = rows;
+            },
+
+            downloadCSV: () => {
+                const headers = ["ID,Driver,Vehicle,Start,End,KM,Status"];
+                const rows = state.trips.map(t => `${t.id},${t.driverName},${t.vehicle},${t.startTime},${t.endTime||''},${t.totalKm||0},${t.status}`);
+                const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
+                const link = document.createElement("a");
+                link.setAttribute("href", encodeURI(csvContent));
+                link.setAttribute("download", "fleet_data.csv");
+                document.body.appendChild(link);
+                link.click();
+            }
+        };
+
+        // --- INIT ---
+        const init = async () => {
+            // Force hide loader after 5s regardless of status (Safety Net)
+            setTimeout(() => {
+                if (!document.getElementById('loading-view').classList.contains('hide')) {
+                    document.getElementById('loading-error').classList.remove('hide');
+                    // Optional: auto-hide if you want to force entry, but better to show error
+                    // document.getElementById('loading-view').classList.add('hide'); 
+                    // window.app.showAuth();
+                }
+            }, 5000);
+
+            // Auth Flow
+            try {
+                // Since this is a standalone file without the immersive environment variables,
+                // we'll stick to anonymous auth for the initial connection.
+                await signInAnonymously(auth);
+            } catch (e) {
+                console.error("Auth Failed:", e);
+            }
+            
+            // Listen to trips
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), orderBy('startTime', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                state.trips = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Refresh current view based on new data
+                if(state.user) window.app.routeUser();
+                
+                // SUCCESS: Hide loader
+                document.getElementById('loading-view').classList.add('hide');
+                if(!state.user) window.app.showAuth();
+            }, (error) => {
+                console.error("Data Sync Error:", error);
+                window.app.showToast("Connection Error: " + error.message);
+                
+                // ERROR: Hide loader so user isn't stuck
+                document.getElementById('loading-view').classList.add('hide');
+                if(!state.user) window.app.showAuth();
+            });
+
+            // Init Icons
+            lucide.createIcons();
+        };
+
+        init();
+    </script>
+</body>
+</html>

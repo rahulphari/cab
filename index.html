@@ -179,6 +179,16 @@
             </header>
 
             <div class="p-4 space-y-6">
+                <!-- REQUESTS SECTION -->
+                <div id="driver-requests" class="space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Pickup Requests / ವಿನಂತಿಗಳು
+                    </h3>
+                    <div id="requests-list" class="space-y-3">
+                        <!-- Request items injected here -->
+                    </div>
+                </div>
+
                 <!-- IDLE STATE -->
                 <div id="driver-idle" class="space-y-6">
                     <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-center">
@@ -217,7 +227,7 @@
                         <div class="absolute top-4 right-4 animate-pulse"><div class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]"></div></div>
                         <span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE / ಚಾಲನೆಯಲ್ಲಿದೆ</span>
                         <h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00</h1>
-                        <p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> Locating...</p>
+                        <p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1 font-mono break-words leading-tight"><i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> Locating...</p>
                     </div>
 
                     <!-- Timeline -->
@@ -256,15 +266,42 @@
             </nav>
 
             <div class="p-4 space-y-6 max-w-lg mx-auto">
+                <!-- REQUEST PICKUP SECTION (New) -->
+                <div id="employee-request-ui" class="bg-white p-6 rounded-3xl border border-blue-100 shadow-md">
+                    <div id="req-idle">
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Need a Ride?</h3>
+                        <p class="text-xs text-slate-500 mb-4">Request a cab to your current location.</p>
+                        <button onclick="window.app.requestPickup()" id="btn-request-pickup" class="w-full bg-blue-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+                            <i data-lucide="map-pin"></i> Request Pickup / ಪಿಕಪ್ ವಿನಂತಿಸಿ
+                        </button>
+                    </div>
+                    
+                    <div id="req-pending" class="hide text-center py-6">
+                        <div class="loader mx-auto border-blue-200 border-t-blue-600 mb-4"></div>
+                        <h3 class="font-bold text-slate-800">Finding a Driver...</h3>
+                        <p class="text-xs text-slate-500 mt-1">Please wait / ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ</p>
+                    </div>
+
+                    <div id="req-accepted" class="hide bg-green-50 p-4 rounded-xl border border-green-200">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold"><i data-lucide="check"></i></div>
+                            <div>
+                                <h3 class="font-bold text-green-800 text-sm">Cab Arriving!</h3>
+                                <p class="text-xs text-green-600" id="req-driver-name">Driver Name</p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-slate-500 flex gap-2">
+                            <i data-lucide="navigation" class="w-3 h-3"></i>
+                            <span id="req-driver-loc">Driver last location...</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- NOT ONBOARD -->
                 <div id="employee-idle" class="space-y-4">
                     <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2"><i data-lucide="rss" class="w-4 h-4"></i> Nearby Cabs <span class="bilingual-sub font-normal text-xs ml-1">(ಹತ್ತಿರದ ಕ್ಯಾಬ್‌ಗಳು)</span></h3>
                     <div id="cab-list" class="space-y-3 pb-20">
                         <!-- Cabs injected here -->
-                        <div class="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-200">
-                            <i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-30"></i>
-                            <p>No active cabs nearby.</p>
-                        </div>
                     </div>
                 </div>
 
@@ -283,7 +320,7 @@
                         <div class="bg-white/10 rounded-xl p-3 mb-4 backdrop-blur-sm">
                             <div class="flex items-center gap-2 text-sm text-blue-100">
                                 <i data-lucide="map-pin" class="w-4 h-4"></i>
-                                <span id="onboard-loc">Boarded at...</span>
+                                <span id="onboard-loc" class="break-words">Boarded at...</span>
                             </div>
                         </div>
 
@@ -363,11 +400,13 @@
         const state = {
             user: null, 
             trips: [],
+            requests: [], // New: Store active requests
             gps: null,
             photo: null,
             activeTrip: null,
             myTrip: null,
-            loginRole: null // currently selected role for login
+            myRequest: null, // New: Store employee's own request
+            loginRole: null
         };
 
         // --- DOM ELEMENTS ---
@@ -389,7 +428,30 @@
             btnRoleEmp: document.getElementById('btn-role-employee'),
             cabList: document.getElementById('cab-list'),
             adminList: document.getElementById('admin-list'),
-            tripTimeline: document.getElementById('trip-timeline')
+            tripTimeline: document.getElementById('trip-timeline'),
+            // New Elements
+            reqList: document.getElementById('requests-list'),
+            reqIdle: document.getElementById('req-idle'),
+            reqPending: document.getElementById('req-pending'),
+            reqAccepted: document.getElementById('req-accepted'),
+            reqDriverName: document.getElementById('req-driver-name'),
+            reqDriverLoc: document.getElementById('req-driver-loc')
+        };
+
+        // --- HELPER: Reverse Geocoding ---
+        const getAddress = async (lat, lng) => {
+            try {
+                // Using OpenStreetMap Nominatim (Free, no key required for low volume)
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                if (!res.ok) throw new Error('Geocode failed');
+                const data = await res.json();
+                // Return a simplified address
+                const parts = data.display_name.split(',');
+                return `${parts[0]}, ${parts[1] || ''}, ${parts[2] || ''}`; 
+            } catch (e) {
+                console.error("Geocode Error:", e);
+                return `${lat}, ${lng}`; // Fallback to coords
+            }
         };
 
         // --- APP LOGIC ---
@@ -418,13 +480,11 @@
                 }, 3000);
             },
 
-            // --- AUTHENTICATION & LOGIN ---
-            
+            // --- AUTH ---
             showAuth: () => window.app.showView('auth-view'),
 
             selectLoginRole: (role) => {
                 state.loginRole = role;
-                // Update Login UI based on role
                 const title = document.getElementById('login-title');
                 const iconContainer = document.getElementById('login-icon-container');
                 
@@ -457,8 +517,8 @@
                 btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Verifying...`;
                 lucide.createIcons();
 
-                // 1. Check Hardcoded Demo Users First
                 let user = null;
+                // Demo Credentials
                 if(state.loginRole === 'driver' && id === 'driver' && pin === '1234') {
                     user = { id: 'd1', name: 'Ramesh Driver', role: 'driver', vehicle: 'Innova KA-01' };
                 } else if(state.loginRole === 'employee' && id === 'employee' && pin === '1234') {
@@ -467,13 +527,11 @@
                     user = { id: 'admin', name: 'Admin', role: 'admin' };
                 }
 
-                // 2. If not found, check Firestore 'users' collection
                 if (!user) {
                     try {
                         const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
                         const q = query(usersRef, where("phone", "==", id), where("pin", "==", pin), where("role", "==", state.loginRole));
                         const snapshot = await getDocs(q);
-                        
                         if (!snapshot.empty) {
                             const doc = snapshot.docs[0];
                             user = { id: doc.id, ...doc.data() };
@@ -501,9 +559,8 @@
             },
 
             // --- REGISTRATION ---
-            
             showOnboarding: () => {
-                state.regRole = 'employee'; // default
+                state.regRole = 'employee';
                 window.app.updateRegUI();
                 window.app.showView('onboarding-view');
             },
@@ -546,7 +603,6 @@
                     createdAt: new Date().toISOString()
                 };
 
-                // Save to Firestore so login works
                 try {
                     const docRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), userData);
                     state.user = { id: docRef.id, ...userData };
@@ -575,14 +631,14 @@
                 }
             },
 
-            // DRIVER LOGIC
+            // --- DRIVER LOGIC ---
             capturePhoto: () => {
                 document.getElementById('camera-input').click();
             },
 
             handlePhotoInput: (input) => {
                 if(input.files && input.files[0]) {
-                    state.photo = input.files[0]; // In real app, upload this
+                    state.photo = input.files[0];
                     const btn = document.getElementById('btn-photo');
                     btn.classList.add('border-emerald-500', 'text-emerald-500');
                     btn.innerHTML = `<i data-lucide="check"></i> Photo OK`;
@@ -597,12 +653,13 @@
                 lucide.createIcons();
 
                 if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition((position) => {
-                        state.gps = {
-                            lat: position.coords.latitude.toFixed(5),
-                            lng: position.coords.longitude.toFixed(5),
-                            timestamp: new Date().toISOString()
-                        };
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        const address = await getAddress(lat, lng);
+                        
+                        state.gps = { lat, lng, address, timestamp: new Date().toISOString() };
+                        
                         status.classList.add('border-emerald-500', 'text-emerald-500');
                         status.innerHTML = `<i data-lucide="map-pin"></i> GPS OK`;
                         lucide.createIcons();
@@ -636,7 +693,7 @@
                     vehicle: state.user.vehicle,
                     startTime: new Date().toISOString(),
                     startOdo: parseInt(odo),
-                    startLocation: `${state.gps.lat}, ${state.gps.lng}`,
+                    startLocation: state.gps.address || `${state.gps.lat}, ${state.gps.lng}`, // Use human address
                     status: 'active',
                     passengers: [],
                     stops: [{
@@ -644,7 +701,7 @@
                         time: new Date().toISOString(),
                         lat: state.gps.lat,
                         lng: state.gps.lng,
-                        desc: 'Shift Started'
+                        desc: 'Shift Started at ' + (state.gps.address || 'Loc')
                     }]
                 };
 
@@ -655,8 +712,7 @@
             endTrip: async () => {
                 const odo = document.getElementById('end-odo').value;
                 if(!state.activeTrip || !odo) return alert("Enter End Odometer");
-                if(parseInt(odo) <= state.activeTrip.startOdo) return alert("End Odo must be > Start Odo");
-
+                
                 const tripRef = doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id);
                 await updateDoc(tripRef, {
                     endTime: new Date().toISOString(),
@@ -675,23 +731,51 @@
                 state.gps = null;
                 document.getElementById('start-odo').value = '';
                 document.getElementById('end-odo').value = '';
-                document.getElementById('btn-photo').innerHTML = `<i data-lucide="camera"></i> <span class="text-xs">Photo</span>`;
-                document.getElementById('btn-photo').className = "p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400";
-                document.getElementById('gps-status').innerHTML = `<i data-lucide="crosshair"></i> <span class="text-xs">GPS Wait</span>`;
+                // Reset buttons visually
                 document.getElementById('gps-status').className = "p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500";
+                document.getElementById('gps-status').innerHTML = `<i data-lucide="crosshair"></i> <span class="text-xs">GPS Wait</span>`;
                 window.app.showToast("Shift Ended. Data Synced.");
+            },
+
+            acceptRequest: async (reqId) => {
+                // Update request
+                const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId);
+                await updateDoc(reqRef, {
+                    status: 'accepted',
+                    driverId: state.user.id,
+                    driverName: state.user.name,
+                    driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route'
+                });
+                window.app.showToast("Request Accepted!");
             },
 
             renderDriverState: () => {
                 const active = state.trips.find(t => t.driverId === state.user.id && t.status === 'active');
                 state.activeTrip = active;
 
+                // Render Requests
+                const pendingReqs = state.requests.filter(r => r.status === 'pending');
+                if(pendingReqs.length > 0) {
+                    els.reqList.innerHTML = pendingReqs.map(r => `
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-sm text-white">${r.employeeName}</p>
+                                <p class="text-xs text-slate-400 break-all max-w-[150px]">${r.pickupAddress}</p>
+                            </div>
+                            <button onclick="window.app.acceptRequest('${r.id}')" class="bg-cyan-600 text-black text-xs font-bold px-3 py-2 rounded-lg shadow hover:bg-cyan-500">
+                                Accept
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    els.reqList.innerHTML = `<p class="text-xs text-slate-500 text-center italic">No pending requests</p>`;
+                }
+
                 if(active) {
                     document.getElementById('driver-idle').classList.add('hide');
                     document.getElementById('driver-active').classList.remove('hide');
-                    document.getElementById('trip-start-loc').innerHTML = `<i data-lucide="map-pin" class="w-3 h-3"></i> ${active.startLocation}`;
+                    document.getElementById('trip-start-loc').innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> ${active.startLocation}`;
                     
-                    // Render Timeline
                     els.tripTimeline.innerHTML = active.stops.map(stop => `
                         <div class="relative flex gap-3 pb-2">
                             <div class="w-2 h-2 mt-1.5 rounded-full ${stop.type==='start'?'bg-cyan-500':stop.type==='pickup'?'bg-purple-500':'bg-orange-500'}"></div>
@@ -708,15 +792,41 @@
                 lucide.createIcons();
             },
 
-            // EMPLOYEE LOGIC
+            // --- EMPLOYEE LOGIC ---
+            requestPickup: () => {
+                const btn = document.getElementById('btn-request-pickup');
+                btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Locating...`;
+                
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        const address = await getAddress(lat, lng);
+
+                        const reqData = {
+                            employeeId: state.user.id,
+                            employeeName: state.user.name,
+                            pickupLat: lat,
+                            pickupLng: lng,
+                            pickupAddress: address,
+                            status: 'pending',
+                            timestamp: new Date().toISOString()
+                        };
+
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), reqData);
+                        btn.innerHTML = `<i data-lucide="map-pin"></i> Request Pickup`; // Reset text
+                    });
+                }
+            },
+
             joinTrip: async (tripId) => {
                 const btn = document.getElementById(`btn-join-${tripId}`);
                 if(btn) btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Joining...`;
 
-                // Quick GPS for boarding
                 navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude.toFixed(5);
-                    const lng = pos.coords.longitude.toFixed(5);
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+                    const address = await getAddress(lat, lng);
                     
                     const trip = state.trips.find(t => t.id === tripId);
                     const newPassengers = [...(trip.passengers || []), { id: state.user.id, name: state.user.name }];
@@ -727,7 +837,7 @@
                             type: 'pickup',
                             time: new Date().toISOString(),
                             lat: lat, lng: lng,
-                            desc: `Pickup: ${state.user.name}`
+                            desc: `Pickup: ${state.user.name} at ${address}`
                         })
                     });
                 });
@@ -740,8 +850,9 @@
                 if(!state.myTrip) return;
                 
                 navigator.geolocation.getCurrentPosition(async (pos) => {
-                     const lat = pos.coords.latitude.toFixed(5);
-                     const lng = pos.coords.longitude.toFixed(5);
+                     const lat = pos.coords.latitude.toFixed(6);
+                     const lng = pos.coords.longitude.toFixed(6);
+                     const address = await getAddress(lat, lng);
 
                      const newPassengers = state.myTrip.passengers.filter(p => p.id !== state.user.id);
                      await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.myTrip.id), {
@@ -750,7 +861,7 @@
                             type: 'drop',
                             time: new Date().toISOString(),
                             lat: lat, lng: lng,
-                            desc: `Drop: ${state.user.name}`
+                            desc: `Drop: ${state.user.name} at ${address}`
                         })
                      });
                 });
@@ -760,15 +871,45 @@
                 const myTrip = state.trips.find(t => t.status === 'active' && t.passengers?.some(p => p.id === state.user.id));
                 state.myTrip = myTrip;
                 
+                // Find active request
+                const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'pending' || r.status === 'accepted'));
+                
                 if(myTrip) {
+                    // Onboard State
                     document.getElementById('employee-idle').classList.add('hide');
+                    document.getElementById('employee-request-ui').classList.add('hide'); // Hide req UI
                     document.getElementById('employee-onboard').classList.remove('hide');
+                    
                     document.getElementById('onboard-driver').innerText = myTrip.driverName;
                     document.getElementById('onboard-vehicle').innerText = myTrip.vehicle;
-                    document.getElementById('onboard-loc').innerText = `Started at ${myTrip.startLocation}`;
-                } else {
+                    document.getElementById('onboard-loc').innerText = `Trip started at ${myTrip.startLocation}`;
+                } 
+                else if (myReq) {
+                    // Requested State (Pending or Accepted)
+                    document.getElementById('employee-idle').classList.add('hide');
+                    document.getElementById('employee-onboard').classList.add('hide');
+                    document.getElementById('employee-request-ui').classList.remove('hide');
+
+                    if(myReq.status === 'pending') {
+                        els.reqIdle.classList.add('hide');
+                        els.reqPending.classList.remove('hide');
+                        els.reqAccepted.classList.add('hide');
+                    } else if(myReq.status === 'accepted') {
+                        els.reqIdle.classList.add('hide');
+                        els.reqPending.classList.add('hide');
+                        els.reqAccepted.classList.remove('hide');
+                        els.reqDriverName.innerText = myReq.driverName;
+                        els.reqDriverLoc.innerText = myReq.driverLoc || 'Unknown Location';
+                    }
+                }
+                else {
+                    // Idle State (Can Request)
                     document.getElementById('employee-idle').classList.remove('hide');
                     document.getElementById('employee-onboard').classList.add('hide');
+                    document.getElementById('employee-request-ui').classList.remove('hide');
+                    els.reqIdle.classList.remove('hide');
+                    els.reqPending.classList.add('hide');
+                    els.reqAccepted.classList.add('hide');
                     
                     const activeTrips = state.trips.filter(t => t.status === 'active');
                     if(activeTrips.length === 0) {
@@ -780,6 +921,7 @@
                                     <div><h3 class="font-bold text-lg text-slate-800">${t.driverName}</h3><p class="text-slate-500 text-sm">${t.vehicle}</p></div>
                                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">${t.passengers?.length || 0} PAX</span>
                                 </div>
+                                <div class="text-xs text-slate-500 mb-3 flex gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${t.startLocation}</div>
                                 <button id="btn-join-${t.id}" onclick="window.app.joinTrip('${t.id}')" class="w-full bg-slate-900 text-white py-3 rounded-xl flex justify-center items-center gap-2 shadow-md active:scale-95">
                                     <i data-lucide="navigation" class="w-4 h-4"></i> Join Ride
                                 </button>
@@ -790,7 +932,7 @@
                 lucide.createIcons();
             },
 
-            // ADMIN LOGIC
+            // --- ADMIN LOGIC ---
             renderAdminState: () => {
                 let totalKm = 0;
                 let activeCount = 0;
@@ -822,8 +964,8 @@
             },
 
             downloadCSV: () => {
-                const headers = ["ID,Driver,Vehicle,Start,End,KM,Status"];
-                const rows = state.trips.map(t => `${t.id},${t.driverName},${t.vehicle},${t.startTime},${t.endTime||''},${t.totalKm||0},${t.status}`);
+                const headers = ["ID,Driver,Vehicle,Start,End,KM,Status,Location"];
+                const rows = state.trips.map(t => `${t.id},${t.driverName},${t.vehicle},${t.startTime},${t.endTime||''},${t.totalKm||0},${t.status},"${t.startLocation||''}"`);
                 const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
                 const link = document.createElement("a");
                 link.setAttribute("href", encodeURI(csvContent));
@@ -835,47 +977,34 @@
 
         // --- INIT ---
         const init = async () => {
-            // Force hide loader after 5s regardless of status (Safety Net)
             setTimeout(() => {
                 if (!document.getElementById('loading-view').classList.contains('hide')) {
                     document.getElementById('loading-error').classList.remove('hide');
-                    // Optional: auto-hide if you want to force entry, but better to show error
-                    // document.getElementById('loading-view').classList.add('hide'); 
-                    // window.app.showAuth();
                 }
             }, 5000);
 
-            // Auth Flow
             try {
-                // Since this is a standalone file without the immersive environment variables,
-                // we'll stick to anonymous auth for the initial connection.
                 await signInAnonymously(auth);
             } catch (e) {
                 console.error("Auth Failed:", e);
             }
             
-            // Listen to trips
+            // Listen to Trips
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), orderBy('startTime', 'desc'));
-            
             onSnapshot(q, (snapshot) => {
                 state.trips = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // Refresh current view based on new data
                 if(state.user) window.app.routeUser();
-                
-                // SUCCESS: Hide loader
                 document.getElementById('loading-view').classList.add('hide');
                 if(!state.user) window.app.showAuth();
-            }, (error) => {
-                console.error("Data Sync Error:", error);
-                window.app.showToast("Connection Error: " + error.message);
-                
-                // ERROR: Hide loader so user isn't stuck
-                document.getElementById('loading-view').classList.add('hide');
-                if(!state.user) window.app.showAuth();
+            }, (err) => console.error(err));
+
+            // Listen to Requests (New)
+            const qReq = query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), orderBy('timestamp', 'desc'));
+            onSnapshot(qReq, (snapshot) => {
+                state.requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if(state.user) window.app.routeUser(); // Re-render to update UI
             });
 
-            // Init Icons
             lucide.createIcons();
         };
 

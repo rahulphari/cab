@@ -283,16 +283,24 @@
                     </div>
 
                     <div id="req-accepted" class="hide bg-green-50 p-4 rounded-xl border border-green-200">
-                        <div class="flex items-center gap-3 mb-3">
+                        <div class="flex items-center gap-3 mb-3 border-b border-green-200 pb-3">
                             <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold"><i data-lucide="check"></i></div>
                             <div>
                                 <h3 class="font-bold text-green-800 text-sm">Cab Arriving!</h3>
                                 <p class="text-xs text-green-600" id="req-driver-name">Driver Name</p>
                             </div>
                         </div>
-                        <div class="text-xs text-slate-500 flex gap-2">
-                            <i data-lucide="navigation" class="w-3 h-3"></i>
-                            <span id="req-driver-loc">Driver last location...</span>
+                        <div class="text-xs text-slate-500 flex gap-2 mb-4 items-center">
+                            <i data-lucide="navigation" class="w-4 h-4 text-slate-400"></i>
+                            <span id="req-driver-loc" class="font-mono">Driver Location...</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="window.app.refreshDriverLoc()" class="bg-white border border-green-200 text-green-700 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95">
+                                <i data-lucide="refresh-cw"></i> Locate
+                            </button>
+                            <button onclick="window.app.boardCabFromRequest()" class="bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                                <i data-lucide="log-in"></i> Board Cab
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -738,13 +746,16 @@
             },
 
             acceptRequest: async (reqId) => {
-                // Update request
+                // IMPORTANT: Link the active Trip ID to the request so the employee joins the right cab
+                const tripId = state.activeTrip ? state.activeTrip.id : null;
+                
                 const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId);
                 await updateDoc(reqRef, {
                     status: 'accepted',
                     driverId: state.user.id,
                     driverName: state.user.name,
-                    driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route'
+                    driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route',
+                    tripId: tripId // Store Trip ID for seamless boarding
                 });
                 window.app.showToast("Request Accepted!");
             },
@@ -819,9 +830,34 @@
                 }
             },
 
+            refreshDriverLoc: () => {
+                // Simply re-renders the UI which pulls latest data from state.trips
+                // In a real app, this might trigger a dedicated fetch
+                window.app.showToast("Refreshing Driver Location...");
+                window.app.renderEmployeeState();
+            },
+
+            boardCabFromRequest: () => {
+                // Finds the trip associated with the current accepted request
+                const myReq = state.requests.find(r => r.employeeId === state.user.id && r.status === 'accepted');
+                if (myReq && myReq.tripId) {
+                    window.app.joinTrip(myReq.tripId);
+                } else if (myReq && myReq.driverId) {
+                    // Fallback: Find active trip by driver ID
+                    const driverTrip = state.trips.find(t => t.driverId === myReq.driverId && t.status === 'active');
+                    if(driverTrip) {
+                        window.app.joinTrip(driverTrip.id);
+                    } else {
+                        window.app.showToast("Driver hasn't started a trip yet.");
+                    }
+                } else {
+                    window.app.showToast("Error: No trip info found.");
+                }
+            },
+
             joinTrip: async (tripId) => {
-                const btn = document.getElementById(`btn-join-${tripId}`);
-                if(btn) btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Joining...`;
+                // Update UI state immediately
+                window.app.showToast("Boarding Cab...");
 
                 navigator.geolocation.getCurrentPosition(async (pos) => {
                     const lat = pos.coords.latitude.toFixed(6);
@@ -829,6 +865,8 @@
                     const address = await getAddress(lat, lng);
                     
                     const trip = state.trips.find(t => t.id === tripId);
+                    if (!trip) return;
+
                     const newPassengers = [...(trip.passengers || []), { id: state.user.id, name: state.user.name }];
                     
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), {
@@ -840,6 +878,13 @@
                             desc: `Pickup: ${state.user.name} at ${address}`
                         })
                     });
+                    
+                    // Also update request to 'completed' so it doesn't show as pending/accepted anymore
+                    const myReq = state.requests.find(r => r.employeeId === state.user.id && r.status === 'accepted');
+                    if (myReq) {
+                         const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', myReq.id);
+                         await updateDoc(reqRef, { status: 'completed' });
+                    }
                 });
             },
 
@@ -873,7 +918,8 @@
                 
                 // Find active request
                 const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'pending' || r.status === 'accepted'));
-                
+                state.myRequest = myReq; // Store for logic use
+
                 if(myTrip) {
                     // Onboard State
                     document.getElementById('employee-idle').classList.add('hide');
@@ -899,7 +945,11 @@
                         els.reqPending.classList.add('hide');
                         els.reqAccepted.classList.remove('hide');
                         els.reqDriverName.innerText = myReq.driverName;
-                        els.reqDriverLoc.innerText = myReq.driverLoc || 'Unknown Location';
+                        
+                        // Try to find the live location from the actual trip if available
+                        const driverTrip = state.trips.find(t => t.driverId === myReq.driverId && t.status === 'active');
+                        const liveLoc = driverTrip ? driverTrip.startLocation : myReq.driverLoc;
+                        els.reqDriverLoc.innerText = liveLoc || 'Location Unavailable';
                     }
                 }
                 else {

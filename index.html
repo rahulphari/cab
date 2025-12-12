@@ -13,7 +13,8 @@
         body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: white; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
         .show { display: block !important; }
-        .bilingual-sub { font-size: 0.8em; opacity: 0.7; display: block; font-weight: normal; }
+        .bilingual-sub { font-size: 0.75em; opacity: 0.7; display: block; font-weight: normal; margin-top: 2px; }
+        .tip-text { font-size: 0.65em; color: #94a3b8; font-style: italic; margin-top: 4px; display: block; }
         
         /* Smooth transitions */
         .view-section { animation: fadeIn 0.3s ease-in-out; }
@@ -64,17 +65,23 @@
                 <i data-lucide="zap" class="w-6 h-6 text-cyan-400 relative z-10"></i>
             </div>
             <h3 class="text-cyan-400 font-bold text-lg animate-pulse">Processing...</h3>
-            <p class="text-slate-500 text-xs mt-1">Synchronizing with Fleet Command</p>
+            <p class="text-slate-500 text-xs mt-1">Synchronizing Database</p>
         </div>
 
-        <!-- CONFIRMATION MODAL -->
+        <!-- UNIVERSAL MODAL (Confirm / Input) -->
         <div id="modal-overlay" class="fixed inset-0 z-[60] hide flex items-center justify-center p-6">
             <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl transform scale-100 transition-transform">
                 <div class="mb-4">
-                    <h3 id="modal-title" class="text-lg font-bold text-white">Confirm Action</h3>
-                    <p id="modal-desc" class="text-sm text-slate-400 mt-1">Are you sure?</p>
+                    <h3 id="modal-title" class="text-lg font-bold text-white">Action</h3>
+                    <p id="modal-desc" class="text-sm text-slate-400 mt-1">Details here</p>
                 </div>
-                <!-- Extra content for location selection -->
+                
+                <!-- Input Field (Hidden by default) -->
+                <div id="modal-input-container" class="mb-4 hide">
+                    <input type="number" id="modal-input" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-white text-lg focus:border-cyan-500 outline-none" placeholder="Enter Value">
+                    <span class="tip-text" id="modal-input-tip"></span>
+                </div>
+
                 <div id="modal-content" class="mb-4"></div>
                 
                 <div class="flex gap-3">
@@ -88,48 +95,46 @@
         <div id="loading-view" class="view-section h-screen flex flex-col items-center justify-center text-center p-6">
             <h1 class="text-4xl font-black mb-4">Cab<span class="text-cyan-400">Sight</span></h1>
             <div class="loader mb-4"></div>
-            <p class="text-slate-400 text-sm">Initializing Satellite Uplink...<br><span class="bilingual-sub">ಸಿಸ್ಟಮ್ ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ...</span></p>
+            <p class="text-slate-400 text-sm">Initializing System...<br><span class="bilingual-sub">ವ್ಯವಸ್ಥೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ...</span></p>
             <p id="loading-error" class="text-red-400 text-xs mt-4 hide">Connection taking too long...</p>
         </div>
 
         <!-- AUTH ROLE SELECTION VIEW -->
-        <div id="auth-view" class="view-section hide flex-1 flex flex-col items-center justify-center p-6 space-y-4">
-            <div class="text-center mb-6">
-                <h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1>
-                <p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p>
+        <div id="auth-view" class="view-section hide flex-1 flex flex-col p-6 relative">
+            <div class="flex-1 flex flex-col justify-center space-y-4">
+                <div class="text-center mb-6">
+                    <h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1>
+                    <p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p>
+                </div>
+
+                <!-- Driver Card -->
+                <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95 text-left group">
+                    <div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400 group-hover:scale-110 transition-transform"><i data-lucide="car"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg">Driver Login</h3>
+                        <span class="bilingual-sub">ಚಾಲಕರ ಲಾಗಿನ್</span>
+                    </div>
+                </button>
+
+                <!-- Employee Card -->
+                <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95 text-left group">
+                    <div class="bg-purple-900/30 p-3 rounded-full text-purple-400 group-hover:scale-110 transition-transform"><i data-lucide="users"></i></div>
+                    <div>
+                        <h3 class="font-bold text-lg">Staff Login</h3>
+                        <span class="bilingual-sub">ಸಿಬ್ಬಂದಿ ಲಾಗಿನ್ (Includes Managers)</span>
+                    </div>
+                </button>
+
+                <div class="w-full h-px bg-slate-800 my-4"></div>
+
+                <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2">
+                    <i data-lucide="user-plus"></i> Register New User / ಹೊಸ ಬಳಕೆದಾರ
+                </button>
             </div>
 
-            <!-- Driver Card -->
-            <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95">
-                <div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400"><i data-lucide="car"></i></div>
-                <div class="text-left">
-                    <h3 class="font-bold text-lg">Driver Login</h3>
-                    <span class="bilingual-sub">ಚಾಲಕರ ಲಾಗಿನ್</span>
-                </div>
-            </button>
-
-            <!-- Employee Card (Admins use this to request rides) -->
-            <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95">
-                <div class="bg-purple-900/30 p-3 rounded-full text-purple-400"><i data-lucide="users"></i></div>
-                <div class="text-left">
-                    <h3 class="font-bold text-lg">Employee Login</h3>
-                    <span class="bilingual-sub">ಉದ್ಯೋಗಿ (ಸವಾರಿ ವಿನಂತಿಸಿ)</span>
-                </div>
-            </button>
-
-            <!-- Admin Card (Dedicated) -->
-            <button onclick="window.app.selectLoginRole('admin')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500 flex items-center gap-4 transition-all active:scale-95">
-                <div class="bg-emerald-900/30 p-3 rounded-full text-emerald-400"><i data-lucide="shield"></i></div>
-                <div class="text-left">
-                    <h3 class="font-bold text-lg">Admin Panel</h3>
-                    <span class="bilingual-sub">ನಿರ್ವಾಹಕರು (ವ್ಯವಸ್ಥಾಪಕರು)</span>
-                </div>
-            </button>
-
-            <div class="w-full h-px bg-slate-800 my-4"></div>
-
-            <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2">
-                <i data-lucide="user-plus"></i> Register New User / ಹೊಸ ಬಳಕೆದಾರ
+            <!-- Small Admin Button in Corner -->
+            <button onclick="window.app.selectLoginRole('admin')" class="absolute top-6 right-6 p-2 text-slate-600 hover:text-emerald-500 transition-colors" title="Admin Login">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
             </button>
         </div>
 
@@ -149,11 +154,13 @@
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold ml-1">Phone Number (ID)</label>
                     <input type="tel" id="login-id" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-lg focus:border-cyan-500 outline-none" placeholder="Enter Phone">
+                    <span class="tip-text">Registered Mobile Number / ನೋಂದಾಯಿತ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</span>
                 </div>
 
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold ml-1">4-Digit PIN</label>
                     <input type="password" id="login-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••">
+                    <span class="tip-text">Secret Security PIN / ರಹಸ್ಯ ಭದ್ರತಾ ಪಿನ್</span>
                 </div>
 
                 <button onclick="window.app.submitLogin()" id="btn-login-submit" class="w-full bg-cyan-600 text-black font-bold p-4 rounded-xl shadow-lg mt-6 flex justify-center items-center gap-2">
@@ -168,21 +175,20 @@
             <div class="space-y-4 overflow-y-auto max-h-[80vh] pb-10">
                 <div>
                     <label class="text-xs text-slate-400 uppercase">Full Name</label>
-                    <input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 outline-none" placeholder="e.g. Raju Kumar">
+                    <input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. Raju Kumar">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400 uppercase">Phone (Login ID)</label>
-                    <input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 outline-none" placeholder="e.g. 9876543210">
+                    <input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. 9876543210">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN</label>
-                    <input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest outline-none" placeholder="••••">
+                    <input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••">
                 </div>
                 
                 <!-- Saved Locations (Only for Staff) -->
                 <div id="reg-locations-section" class="hide border border-slate-700 rounded-xl p-4 bg-slate-800/50">
                     <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="map-pin"></i> Preferred Locations</h3>
-                    
                     <div class="space-y-3">
                         <div class="flex gap-2">
                             <input type="text" id="loc-day-addr" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg" placeholder="Day Pickup (e.g. Home)" readonly>
@@ -192,12 +198,12 @@
                             <input type="text" id="loc-night-addr" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg" placeholder="Night Pickup (e.g. Relative)" readonly>
                             <button onclick="window.app.captureProfileLoc('night')" class="bg-indigo-600/20 text-indigo-400 p-2 rounded-lg border border-indigo-600/50"><i data-lucide="moon"></i></button>
                         </div>
-                        <p class="text-[10px] text-slate-500 italic">Tap icon to capture current GPS location</p>
+                        <p class="text-[10px] text-slate-500 italic">Tap icon to capture current GPS location / ಪ್ರಸ್ತುತ ಸ್ಥಳವನ್ನು ಉಳಿಸಲು ಐಕಾನ್ ಟ್ಯಾಪ್ ಮಾಡಿ</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Category</label>
+                    <label class="text-xs text-slate-400 uppercase">Category / ವರ್ಗ</label>
                     <div class="grid grid-cols-2 gap-3 mt-1">
                         <button onclick="window.app.selectRegRole('driver')" id="btn-role-driver" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2">
                             <i data-lucide="car"></i> Driver
@@ -214,7 +220,7 @@
                 </div>
                 
                 <div id="reg-staff-fields" class="hide">
-                    <label class="text-xs text-slate-400 uppercase mb-1 block">Designation</label>
+                    <label class="text-xs text-slate-400 uppercase mb-1 block">Designation / ಹುದ್ದೆ</label>
                     <select id="reg-designation" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none text-white">
                         <option value="Ground Coordinator">Ground Coordinator</option>
                         <option value="Process Executive">Process Executive</option>
@@ -283,20 +289,14 @@
                             <div>
                                 <label class="text-xs text-slate-400">START ODOMETER</label>
                                 <input type="number" id="start-odo" class="w-full bg-slate-800 rounded-xl p-3 text-2xl font-mono border border-slate-700 focus:border-cyan-500 outline-none" placeholder="00000">
+                                <span class="tip-text">Enter current reading from dashboard / ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಿಂದ ಪ್ರಸ್ತುತ ರೀಡಿಂಗ್ ನಮೂದಿಸಿ</span>
                             </div>
                             
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="window.app.capturePhoto()" id="btn-photo" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
-                                    <i data-lucide="camera"></i>
-                                    <span class="text-xs">Photo</span>
-                                </button>
-                                <div id="gps-status" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500">
-                                    <i data-lucide="crosshair"></i>
-                                    <span class="text-xs">GPS Wait</span>
-                                </div>
+                            <!-- GPS Status (Removed Photo) -->
+                            <div id="gps-status" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500 mt-2 cursor-pointer" onclick="window.app.getGPSLocation()">
+                                <i data-lucide="crosshair"></i>
+                                <span class="text-xs">Tap to Fetch GPS</span>
                             </div>
-
-                            <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="window.app.handlePhotoInput(this)">
                         </div>
 
                         <button onclick="window.app.confirmAction('Start Duty?', 'This will begin your GPS log.', window.app.startTrip)" id="btn-start-trip" class="w-full mt-6 bg-slate-800 text-slate-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all" disabled>
@@ -309,7 +309,7 @@
                 <div id="driver-active" class="hide space-y-6">
                     <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 border border-emerald-800 relative overflow-hidden shadow-xl">
                         <div class="absolute top-4 right-4 animate-pulse"><div class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]"></div></div>
-                        <span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE / ಚಾಲನೆಯಲ್ಲಿದೆ</span>
+                        <span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE</span>
                         <h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00:00</h1>
                         <p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1 font-mono break-words leading-tight"><i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> Locating...</p>
                     </div>
@@ -318,7 +318,7 @@
                     <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-800">
                             <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
-                            <span class="text-sm font-bold text-slate-300">Live Timeline <span class="bilingual-sub inline ml-2">ಟೈಮ್‌ಲೈನ್</span></span>
+                            <span class="text-sm font-bold text-slate-300">Live Timeline</span>
                         </div>
                         <div id="trip-timeline" class="space-y-4 pl-2 border-l border-slate-800 ml-2"></div>
                     </div>
@@ -387,7 +387,7 @@
                         <!-- BOARDING UI -->
                         <div id="req-boarding-ui" class="hide border-t border-green-200 pt-4 mt-2">
                             <p class="text-xs font-bold text-slate-600 mb-2 text-center">Driver is here!</p>
-                            <button onclick="window.app.confirmAction('Board Cab?', 'Confirm you are inside.', window.app.boardCabFromRequest)" class="w-full bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                            <button onclick="window.app.handleBoardingClick()" class="w-full bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95">
                                 <i data-lucide="log-in"></i> CONFIRM BOARDING
                             </button>
                         </div>
@@ -518,7 +518,7 @@
             tripTimeline: document.getElementById('trip-timeline'), reqList: document.getElementById('requests-list'),
             reqIdle: document.getElementById('req-idle'), reqPending: document.getElementById('req-pending'), reqAccepted: document.getElementById('req-accepted'), reqDriverName: document.getElementById('req-driver-name'), reqDriverLoc: document.getElementById('req-driver-loc'), reqCallBtn: document.getElementById('req-call-btn'), reqStatusText: document.getElementById('req-status-text'), reqWaitingUi: document.getElementById('req-waiting-ui'), reqBoardingUi: document.getElementById('req-boarding-ui'),
             onboardDriver: document.getElementById('onboard-driver'), onboardVehicle: document.getElementById('onboard-vehicle'), onboardLoc: document.getElementById('onboard-loc'), btnShareWa: document.getElementById('btn-share-wa'),
-            modal: document.getElementById('modal-overlay'), modalTitle: document.getElementById('modal-title'), modalDesc: document.getElementById('modal-desc'), modalContent: document.getElementById('modal-content'), processing: document.getElementById('processing-overlay'),
+            modal: document.getElementById('modal-overlay'), modalTitle: document.getElementById('modal-title'), modalDesc: document.getElementById('modal-desc'), modalContent: document.getElementById('modal-content'), modalInputContainer: document.getElementById('modal-input-container'), modalInput: document.getElementById('modal-input'), modalInputTip: document.getElementById('modal-input-tip'), processing: document.getElementById('processing-overlay'),
             locDayAddr: document.getElementById('loc-day-addr'), locNightAddr: document.getElementById('loc-night-addr'),
             routeSuggestion: document.getElementById('route-suggestion'), routeSteps: document.getElementById('route-steps'), routeTotal: document.getElementById('route-total'), tripTimer: document.getElementById('trip-timer'),
             btnAdminSwitch: document.getElementById('btn-admin-switch')
@@ -540,11 +540,35 @@
         window.app = {
             showView: (viewId) => { els.views.forEach(id => document.getElementById(id).classList.toggle('hide', id !== viewId)); lucide.createIcons(); },
             showToast: (msg) => { els.toastMsg.innerText = msg; els.toast.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => els.toast.classList.add('opacity-0', 'pointer-events-none'), 3000); },
+            
+            // Standard Confirm Modal
             confirmAction: (title, desc, actionFn) => {
-                els.modalTitle.innerText = title; els.modalDesc.innerText = desc; els.modalContent.innerHTML = ''; state.pendingAction = actionFn; els.modal.classList.remove('hide');
+                els.modalTitle.innerText = title; els.modalDesc.innerText = desc; 
+                els.modalContent.innerHTML = ''; 
+                els.modalInputContainer.classList.add('hide'); // Hide input
+                state.pendingAction = actionFn; 
+                els.modal.classList.remove('hide');
                 document.getElementById('modal-confirm-btn').onclick = async () => { if (state.pendingAction) await state.pendingAction(); window.app.closeModal(); };
             },
-            closeModal: () => { els.modal.classList.add('hide'); state.pendingAction = null; els.modalContent.innerHTML = ''; },
+            
+            // Input Modal (For Odometer)
+            promptInput: (title, desc, tip, actionFn) => {
+                els.modalTitle.innerText = title; els.modalDesc.innerText = desc;
+                els.modalContent.innerHTML = '';
+                els.modalInputContainer.classList.remove('hide');
+                els.modalInput.value = '';
+                els.modalInputTip.innerText = tip;
+                els.modal.classList.remove('hide');
+                
+                document.getElementById('modal-confirm-btn').onclick = async () => {
+                    const val = els.modalInput.value;
+                    if(!val) return window.app.showToast("Value required");
+                    if (actionFn) await actionFn(val);
+                    window.app.closeModal();
+                };
+            },
+
+            closeModal: () => { els.modal.classList.add('hide'); state.pendingAction = null; els.modalContent.innerHTML = ''; els.modalInputContainer.classList.add('hide'); },
             
             // AUTH
             showAuth: () => window.app.showView('auth-view'),
@@ -569,21 +593,17 @@
                         const doc = snapshot.docs[0];
                         const user = { id: doc.id, ...doc.data() };
                         
-                        // Strict Role Validation based on Portal
+                        // Strict Role Validation
                         if (state.loginRole === 'driver' && user.role !== 'driver') throw new Error("Not a driver account");
-                        // Employee Login: Allowed for Employees, Admins, Superusers
                         if (state.loginRole === 'employee' && user.role === 'driver') throw new Error("Drivers cannot use employee portal");
-                        // Admin Login: Allowed only for Admins/Superusers
                         if (state.loginRole === 'admin' && user.role !== 'admin' && user.role !== 'superuser') throw new Error("Access Denied: Managers Only");
 
                         if (user.status === 'suspended') throw new Error("Account Suspended");
                         if (user.status === 'pending') { state.user = user; window.app.showView('pending-view'); return; }
                         
-                        // Success
                         state.user = user;
-                        // Save login intent to localStorage so refresh keeps them in the right portal
                         localStorage.setItem('cabsight_uid', user.id);
-                        localStorage.setItem('cabsight_mode', state.loginRole); // 'driver', 'employee', 'admin'
+                        localStorage.setItem('cabsight_mode', state.loginRole);
                         
                         window.app.showToast(`Welcome, ${user.name}`);
                         window.app.routeUser();
@@ -595,7 +615,6 @@
             logout: () => { state.user = null; localStorage.removeItem('cabsight_uid'); localStorage.removeItem('cabsight_mode'); window.app.showView('auth-view'); },
             
             switchToAdmin: () => {
-                // Allows an admin logged in as employee to switch views without re-login
                 if (state.user && (state.user.role === 'admin' || state.user.role === 'superuser')) {
                     localStorage.setItem('cabsight_mode', 'admin');
                     state.loginRole = 'admin';
@@ -638,27 +657,20 @@
                 if(!state.user) return window.app.showView('auth-view');
                 if (state.user.status === 'pending') return window.app.showView('pending-view');
                 
-                // Route based on stored mode (login intent)
                 const mode = localStorage.getItem('cabsight_mode');
                 
                 if (mode === 'admin') {
-                    // Safety check
                     if (state.user.role === 'admin' || state.user.role === 'superuser') {
                         window.app.showView('admin-view'); window.app.renderAdminState();
-                    } else {
-                        // If roles changed/revoked, force logout or fallback
-                        window.app.logout();
-                    }
+                    } else window.app.logout();
                 } else if (mode === 'driver') {
                     if (state.user.role === 'driver') {
                         document.getElementById('d-name').innerText = state.user.name; document.getElementById('d-vehicle').innerText = state.user.vehicle; window.app.showView('driver-view'); window.app.renderDriverState();
                     } else window.app.logout();
                 } else {
-                    // Default to Employee View (mode 'employee')
                     document.getElementById('e-name').innerText = state.user.name; 
                     document.getElementById('emp-role-display').innerText = state.user.designation || 'Staff';
                     
-                    // Show "Switch to Admin" if eligible
                     if (state.user.role === 'admin' || state.user.role === 'superuser') els.btnAdminSwitch.classList.remove('hide');
                     else els.btnAdminSwitch.classList.add('hide');
                     
@@ -667,15 +679,14 @@
             },
 
             // DRIVER ACTIONS
-            capturePhoto: () => document.getElementById('camera-input').click(),
-            handlePhotoInput: (input) => { if(input.files[0]) { state.photo = input.files[0]; document.getElementById('btn-photo').classList.add('border-emerald-500', 'text-emerald-500'); window.app.getGPSLocation(); } },
+            // Removed capturePhoto & handlePhotoInput - Photo logic deleted.
             getGPSLocation: () => {
                 document.getElementById('gps-status').innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i>`;
                 navigator.geolocation.getCurrentPosition(async (pos) => {
                     const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
                     state.gps = { lat, lng, address };
                     document.getElementById('gps-status').innerHTML = `<i data-lucide="map-pin"></i> GPS OK`; document.getElementById('gps-status').classList.add('text-emerald-500', 'border-emerald-500');
-                    if(document.getElementById('start-odo').value && state.photo) document.getElementById('btn-start-trip').disabled = false;
+                    if(document.getElementById('start-odo').value) document.getElementById('btn-start-trip').disabled = false;
                 });
             },
             startTrip: async () => {
@@ -696,7 +707,7 @@
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         calculatedDist += calcDist(prev.lat, prev.lng, pos.coords.latitude, pos.coords.longitude);
                         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id), { endTime: new Date().toISOString(), endOdo: parseInt(odo), totalKm: parseInt(odo) - state.activeTrip.startOdo, calculatedKm: calculatedDist.toFixed(1), status: 'completed', stops: arrayUnion({ type: 'end', time: new Date().toISOString(), lat: pos.coords.latitude, lng: pos.coords.longitude, desc: 'Ended' }) });
-                        state.photo = null; state.gps = null; document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = ''; window.app.showToast("Duty Ended. Stats Saved.");
+                        state.gps = null; document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = ''; window.app.showToast("Duty Ended. Stats Saved.");
                         setLoading(false);
                     });
                 } catch(e) { setLoading(false); }
@@ -810,24 +821,59 @@
                 } finally { setLoading(false); }
             },
             refreshDriverLoc: () => { setLoading(true); setTimeout(() => { window.app.showToast("Refreshed."); window.app.renderEmployeeState(); setLoading(false); }, 800); },
-            boardCabFromRequest: () => {
+            
+            // Handle "Confirm Boarding" Button Click
+            handleBoardingClick: () => {
                 const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
-                if (myReq && myReq.tripId) window.app.joinTrip(myReq.tripId);
-                else window.app.showToast("No active trip found.");
+                
+                // Get Trip
+                const trip = state.trips.find(t => t.id === myReq?.tripId) || state.trips.find(t => t.driverId === myReq?.driverId && t.status === 'active');
+                
+                if(!trip) return window.app.showToast("No active trip found.");
+
+                // If FIRST PASSENGER (no previous stops or passengers array empty/undefined), Ask ODO
+                const isFirst = (!trip.passengers || trip.passengers.length === 0);
+                
+                if(isFirst) {
+                    window.app.promptInput(
+                        "Verify Odometer / ಓಡೋಮೀಟರ್", 
+                        "You are the first passenger. Enter dashboard reading.", 
+                        "Helps verify driver claims", 
+                        (val) => window.app.boardCabWithOdo(trip.id, val)
+                    );
+                } else {
+                    window.app.confirmAction('Board Cab?', 'Confirm you are inside.', () => window.app.boardCabWithOdo(trip.id, null));
+                }
             },
-            joinTrip: async (tripId) => {
+
+            boardCabWithOdo: async (tripId, userOdo) => {
                 setLoading(true);
                 try {
                     const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
                     const waitMins = myReq && myReq.arrivedTime ? Math.round((new Date() - new Date(myReq.arrivedTime))/60000) : 0;
+                    
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
-                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), { passengers: arrayUnion({ id: state.user.id, name: state.user.name, waitTime: waitMins }), stops: arrayUnion({ type: 'pickup', time: new Date().toISOString(), lat, lng, desc: `Pickup: ${state.user.name} (Wait: ${waitMins}m)` }) });
+                        
+                        const updateData = {
+                            passengers: arrayUnion({ id: state.user.id, name: state.user.name, waitTime: waitMins }),
+                            stops: arrayUnion({ type: 'pickup', time: new Date().toISOString(), lat, lng, desc: `Pickup: ${state.user.name}` })
+                        };
+                        
+                        // If user entered Odo verification
+                        if(userOdo) {
+                            updateData['firstPassengerOdo'] = parseInt(userOdo);
+                            updateData['firstPassengerId'] = state.user.id;
+                        }
+
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), updateData);
+                        
                         if(myReq) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', myReq.id), { status: 'completed' });
                         setLoading(false);
                     });
-                } catch(e) { setLoading(false); }
+                } catch(e) { setLoading(false); window.app.showToast("Boarding Failed"); }
             },
+
             leaveTrip: async () => {
                 if(!state.myTrip) return;
                 setLoading(true);
@@ -902,7 +948,19 @@
                     </div>`).join('');
                 els.adminTripList.innerHTML = state.trips.map(t => {
                     const variance = t.totalKm && t.calculatedKm ? (t.totalKm - t.calculatedKm).toFixed(1) : 0;
-                    return `<div class="bg-white p-4 rounded-xl border ${t.validationStatus === 'valid' ? 'border-emerald-500 bg-emerald-50' : t.validationStatus === 'flagged' ? 'border-red-500 bg-red-50' : 'border-slate-200'}"><div class="flex justify-between items-start mb-2"><div><p class="text-xs font-mono text-slate-400">${t.tripIdDisplay || t.id.substr(0,8)}</p><p class="font-bold text-sm">${t.driverName}</p></div><div class="text-right"><p class="text-xs font-bold ${t.status==='active'?'text-green-600':'text-slate-500'} uppercase">${t.status}</p><p class="text-[10px] text-slate-400">${new Date(t.startTime).toLocaleDateString()}</p></div></div><div class="grid grid-cols-3 gap-2 text-xs mb-3 bg-slate-50 p-2 rounded"><div><span class="block text-slate-400">Claimed</span><span class="font-bold">${t.totalKm || 0} km</span></div><div><span class="block text-slate-400">Calc</span><span class="font-bold">${t.calculatedKm || 0} km</span></div><div><span class="block text-slate-400">Var</span><span class="font-bold ${variance>5?'text-red-600':'text-green-600'}">${variance} km</span></div></div>
+                    
+                    // Admin Odo Check
+                    let odoCheckHtml = '';
+                    if(t.firstPassengerOdo) {
+                        const distToPickup = calcDist(t.startLat, t.startLng, t.stops[1]?.lat, t.stops[1]?.lng); // Approx 2nd stop is pickup
+                        const expectedOdo = t.startOdo + distToPickup;
+                        const diff = Math.abs(t.firstPassengerOdo - expectedOdo).toFixed(1);
+                        odoCheckHtml = `<div class="mt-2 pt-2 border-t border-slate-100"><span class="block text-slate-400">Verif. Odo Diff</span><span class="font-bold ${diff>3?'text-red-500':'text-emerald-500'}">${diff} km</span></div>`;
+                    } else {
+                        odoCheckHtml = `<div class="mt-2 pt-2 border-t border-slate-100"><span class="block text-slate-300 italic">No verification</span></div>`;
+                    }
+
+                    return `<div class="bg-white p-4 rounded-xl border ${t.validationStatus === 'valid' ? 'border-emerald-500 bg-emerald-50' : t.validationStatus === 'flagged' ? 'border-red-500 bg-red-50' : 'border-slate-200'}"><div class="flex justify-between items-start mb-2"><div><p class="text-xs font-mono text-slate-400">${t.tripIdDisplay || t.id.substr(0,8)}</p><p class="font-bold text-sm">${t.driverName}</p></div><div class="text-right"><p class="text-xs font-bold ${t.status==='active'?'text-green-600':'text-slate-500'} uppercase">${t.status}</p><p class="text-[10px] text-slate-400">${new Date(t.startTime).toLocaleDateString()}</p></div></div><div class="grid grid-cols-3 gap-2 text-xs mb-3 bg-slate-50 p-2 rounded"><div><span class="block text-slate-400">Claimed</span><span class="font-bold">${t.totalKm || 0} km</span></div><div><span class="block text-slate-400">Calc</span><span class="font-bold">${t.calculatedKm || 0} km</span></div><div><span class="block text-slate-400">Var</span><span class="font-bold ${variance>5?'text-red-600':'text-green-600'}">${variance} km</span></div>${odoCheckHtml}</div>
                     ${isSuper ? `<div class="flex gap-2 justify-end">${t.validationStatus!=='valid'?`<button onclick="window.app.validateTrip('${t.id}', 'valid')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Validate</button>`:''}${t.validationStatus!=='flagged'?`<button onclick="window.app.confirmAction('Flag Trip?', 'Mark as suspicious.', () => window.app.validateTrip('${t.id}', 'flagged'))" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded">Flag</button>`:''}</div>` : ''}</div>`;
                 }).join('');
                 lucide.createIcons();

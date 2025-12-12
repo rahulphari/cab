@@ -35,11 +35,11 @@
     <!-- APP CONTAINER -->
     <div id="app-container" class="max-w-md mx-auto min-h-screen bg-slate-950 relative pb-20 shadow-2xl overflow-hidden flex flex-col">
         
-        <!-- GLOBAL STATUS BAR (New) -->
+        <!-- GLOBAL STATUS BAR -->
         <div id="status-bar" class="bg-slate-900 px-4 py-2 flex justify-between items-center text-[10px] text-slate-400 border-b border-slate-800 z-50">
-            <div class="flex items-center gap-1">
-                <i data-lucide="map-pin" class="w-3 h-3"></i>
-                <span id="live-location">Locating...</span>
+            <div class="flex items-center gap-1 max-w-[60%]">
+                <i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i>
+                <span id="live-location" class="truncate">Locating...</span>
             </div>
             <div class="flex items-center gap-1 font-mono text-cyan-400">
                 <span id="live-clock">00:00:00</span>
@@ -106,7 +106,7 @@
             <button onclick="window.app.selectLoginRole('admin')" class="text-xs text-slate-600 mt-4">Admin Access / ನಿರ್ವಾಹಕರು</button>
         </div>
 
-        <!-- NEW: LOGIN & PIN VIEW -->
+        <!-- LOGIN & PIN VIEW -->
         <div id="login-form-view" class="view-section hide flex-1 flex flex-col justify-center p-6 bg-slate-950">
             <button onclick="window.app.showAuth()" class="absolute top-16 left-6 p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><i data-lucide="arrow-left"></i></button>
             
@@ -116,7 +116,6 @@
                 </div>
                 <h2 id="login-title" class="text-2xl font-bold">Login</h2>
                 <p class="text-slate-400 text-sm">Enter Credentials / ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ</p>
-                <!-- Hint for demo -->
                 <p class="text-[10px] text-slate-600 mt-2 bg-slate-900 inline-block px-2 py-1 rounded">Demo PIN: 1234</p>
             </div>
 
@@ -140,23 +139,19 @@
         <!-- ONBOARDING VIEW -->
         <div id="onboarding-view" class="view-section hide flex-1 p-6 bg-slate-900 flex flex-col justify-center">
             <h2 class="text-2xl font-bold mb-6">Setup Profile <span class="bilingual-sub">ಪ್ರೊಫೈಲ್ ರಚಿಸಿ</span></h2>
-            
             <div class="space-y-4 overflow-y-auto max-h-[80vh] pb-10">
                 <div>
                     <label class="text-xs text-slate-400 uppercase">Full Name / ಪೂರ್ಣ ಹೆಸರು</label>
                     <input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. Raju Kumar">
                 </div>
-
                 <div>
                     <label class="text-xs text-slate-400 uppercase">Phone (Login ID) / ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label>
                     <input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. 9876543210">
                 </div>
-
                 <div>
                     <label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN / ಪಿನ್ ಸೆಟ್ ಮಾಡಿ</label>
                     <input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••">
                 </div>
-
                 <div>
                     <label class="text-xs text-slate-400 uppercase">Role / ಪಾತ್ರ</label>
                     <div class="grid grid-cols-2 gap-3 mt-1">
@@ -168,14 +163,10 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Driver Specific -->
                 <div id="reg-driver-fields" class="hide space-y-4">
                     <input type="text" id="reg-vehicle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Vehicle Model (e.g. Innova)">
                     <input type="text" id="reg-plate" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Plate No (e.g. KA-01-AB-1234)">
                 </div>
-
-                <!-- Employee Specific -->
                 <div id="reg-employee-fields" class="hide">
                     <select id="reg-dept" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none">
                         <option value="">Select Department / ಇಲಾಖೆ</option>
@@ -184,7 +175,6 @@
                         <option value="Sales">Sales</option>
                     </select>
                 </div>
-
                 <div class="flex gap-3 mt-6">
                     <button onclick="window.app.showAuth()" class="flex-1 p-4 rounded-xl bg-slate-800 text-slate-400 font-bold">Cancel</button>
                     <button onclick="window.app.completeRegistration()" class="flex-[2] p-4 rounded-xl bg-cyan-600 text-black font-bold shadow-lg shadow-cyan-900/50">Register</button>
@@ -204,7 +194,6 @@
 
         <!-- DRIVER DASHBOARD -->
         <div id="driver-view" class="view-section hide min-h-screen bg-black pb-24 overflow-y-auto">
-            <!-- Header -->
             <header class="bg-slate-900 p-4 sticky top-0 z-20 border-b border-slate-800 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <div id="d-avatar" class="w-10 h-10 rounded-full bg-cyan-900 border border-cyan-500 flex items-center justify-center font-bold text-cyan-400">D</div>
@@ -217,16 +206,6 @@
             </header>
 
             <div class="p-4 space-y-6">
-                <!-- REQUESTS SECTION -->
-                <div id="driver-requests" class="space-y-4">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Pickup Requests / ವಿನಂತಿಗಳು
-                    </h3>
-                    <div id="requests-list" class="space-y-3">
-                        <!-- Request items injected here -->
-                    </div>
-                </div>
-
                 <!-- IDLE STATE -->
                 <div id="driver-idle" class="space-y-6">
                     <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-center">
@@ -266,6 +245,16 @@
                         <span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE / ಚಾಲನೆಯಲ್ಲಿದೆ</span>
                         <h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00</h1>
                         <p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1 font-mono break-words leading-tight"><i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> Locating...</p>
+                    </div>
+
+                    <!-- REQUESTS SECTION IN TRIP -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Next Pickups
+                        </h3>
+                        <div id="requests-list" class="space-y-3">
+                            <!-- Request items injected here -->
+                        </div>
                     </div>
 
                     <!-- Timeline -->
@@ -325,23 +314,30 @@
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold"><i data-lucide="check"></i></div>
                                 <div>
-                                    <h3 class="font-bold text-green-800 text-sm">Cab Arriving!</h3>
+                                    <h3 class="font-bold text-green-800 text-sm" id="req-status-text">Cab Arriving!</h3>
                                     <p class="text-xs text-green-600" id="req-driver-name">Driver Name</p>
                                 </div>
                             </div>
-                            <!-- Call Driver -->
                             <a id="req-call-btn" href="#" class="bg-white p-2 rounded-full shadow text-green-600"><i data-lucide="phone"></i></a>
                         </div>
+                        
                         <div class="text-xs text-slate-500 flex gap-2 mb-4 items-center">
                             <i data-lucide="navigation" class="w-4 h-4 text-slate-400"></i>
                             <span id="req-driver-loc" class="font-mono">Driver Location...</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="window.app.refreshDriverLoc()" class="bg-white border border-green-200 text-green-700 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95">
-                                <i data-lucide="refresh-cw"></i> Locate
+
+                        <!-- BOARDING UI (Hidden until driver arrives) -->
+                        <div id="req-boarding-ui" class="hide border-t border-green-200 pt-4 mt-2">
+                            <p class="text-xs font-bold text-slate-600 mb-2 text-center">Driver is here!</p>
+                            <button onclick="window.app.confirmAction('Board Cab?', 'Confirm you are inside.', window.app.boardCabFromRequest)" class="w-full bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                                <i data-lucide="log-in"></i> CONFIRM BOARDING
                             </button>
-                            <button onclick="window.app.confirmAction('Board Cab?', 'Confirm you are inside.', window.app.boardCabFromRequest)" class="bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95">
-                                <i data-lucide="log-in"></i> Board Cab
+                        </div>
+
+                        <!-- WAITING UI -->
+                        <div id="req-waiting-ui" class="grid grid-cols-1 gap-2">
+                            <button onclick="window.app.refreshDriverLoc()" class="bg-white border border-green-200 text-green-700 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95">
+                                <i data-lucide="refresh-cw"></i> Refresh Location
                             </button>
                         </div>
                     </div>
@@ -374,7 +370,12 @@
                             </div>
                         </div>
 
-                        <button onclick="window.app.confirmAction('Drop/Leave Cab?', 'Confirm you have reached destination.', window.app.leaveTrip)" id="btn-leave" class="w-full bg-white text-blue-600 py-4 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95">
+                        <!-- WHATSAPP SHARE -->
+                        <a id="btn-share-wa" href="#" target="_blank" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 mb-3 active:scale-95">
+                            <i data-lucide="share-2"></i> Share Ride Details (WhatsApp)
+                        </a>
+
+                        <button onclick="window.app.confirmAction('Drop/Leave Cab?', 'Confirm you have reached destination.', window.app.leaveTrip)" id="btn-leave" class="w-full bg-white text-blue-600 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95">
                             <i data-lucide="map-pin"></i> Drop / Leave <span class="bilingual-sub text-[10px] text-blue-400 font-normal">ಇಳಿಯಿರಿ</span>
                         </button>
                     </div>
@@ -402,8 +403,6 @@
             </div>
 
             <div class="p-4 pb-20">
-                
-                <!-- TRIPS TAB -->
                 <div id="admin-tab-trips">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-slate-700">Trip Audits</h3>
@@ -411,19 +410,12 @@
                             <i data-lucide="download" class="w-3 h-3"></i> Export CSV
                         </button>
                     </div>
-                    <div id="admin-trip-list" class="space-y-4">
-                        <!-- Trips injected here -->
-                    </div>
+                    <div id="admin-trip-list" class="space-y-4"></div>
                 </div>
-
-                <!-- USERS TAB -->
                 <div id="admin-tab-users" class="hide">
                     <h3 class="font-bold text-slate-700 mb-4">User Management</h3>
-                    <div id="admin-user-list" class="space-y-3">
-                        <!-- Users injected here -->
-                    </div>
+                    <div id="admin-user-list" class="space-y-3"></div>
                 </div>
-
             </div>
         </div>
 
@@ -455,7 +447,7 @@
         const state = {
             user: null, 
             trips: [],
-            usersList: [], // For admin
+            usersList: [], 
             requests: [], 
             gps: null,
             photo: null,
@@ -463,7 +455,7 @@
             myTrip: null,
             myRequest: null, 
             loginRole: null,
-            pendingAction: null // For modal
+            pendingAction: null
         };
 
         // --- DOM ELEMENTS ---
@@ -471,7 +463,6 @@
             views: ['loading-view', 'auth-view', 'login-form-view', 'onboarding-view', 'pending-view', 'driver-view', 'employee-view', 'admin-view'],
             toast: document.getElementById('toast'),
             toastMsg: document.getElementById('toast-msg'),
-            // Inputs
             regName: document.getElementById('reg-name'),
             regPhone: document.getElementById('reg-phone'),
             regPin: document.getElementById('reg-pin'),
@@ -480,12 +471,10 @@
             regDept: document.getElementById('reg-dept'),
             loginId: document.getElementById('login-id'),
             loginPin: document.getElementById('login-pin'),
-            // Sections
             driverFields: document.getElementById('reg-driver-fields'),
             empFields: document.getElementById('reg-employee-fields'),
             btnRoleDriver: document.getElementById('btn-role-driver'),
             btnRoleEmp: document.getElementById('btn-role-employee'),
-            // Lists
             cabList: document.getElementById('cab-list'),
             adminTripList: document.getElementById('admin-trip-list'),
             adminUserList: document.getElementById('admin-user-list'),
@@ -498,6 +487,14 @@
             reqDriverName: document.getElementById('req-driver-name'),
             reqDriverLoc: document.getElementById('req-driver-loc'),
             reqCallBtn: document.getElementById('req-call-btn'),
+            reqStatusText: document.getElementById('req-status-text'),
+            reqWaitingUi: document.getElementById('req-waiting-ui'),
+            reqBoardingUi: document.getElementById('req-boarding-ui'),
+            // Onboard UI
+            onboardDriver: document.getElementById('onboard-driver'),
+            onboardVehicle: document.getElementById('onboard-vehicle'),
+            onboardLoc: document.getElementById('onboard-loc'),
+            btnShareWa: document.getElementById('btn-share-wa'),
             // Modal
             modal: document.getElementById('modal-overlay'),
             modalTitle: document.getElementById('modal-title'),
@@ -506,12 +503,12 @@
 
         // --- HELPER: Haversine Distance (km) ---
         const calcDist = (lat1, lon1, lat2, lon2) => {
+            if(!lat1 || !lon1 || !lat2 || !lon2) return 0;
             const R = 6371; 
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         };
 
         const getAddress = async (lat, lng) => {
@@ -526,261 +523,124 @@
 
         // --- APP LOGIC ---
         window.app = {
-            // UI Utilities
-            showView: (viewId) => {
-                els.views.forEach(id => {
-                    const el = document.getElementById(id);
-                    if(id === viewId) {
-                        el.classList.remove('hide');
-                        lucide.createIcons();
-                    } else {
-                        el.classList.add('hide');
-                    }
-                });
-            },
-
-            showToast: (msg) => {
-                els.toastMsg.innerText = msg;
-                els.toast.classList.remove('opacity-0', 'pointer-events-none');
-                setTimeout(() => els.toast.classList.add('opacity-0', 'pointer-events-none'), 3000);
-            },
-
-            // Modal Logic
+            showView: (viewId) => { els.views.forEach(id => document.getElementById(id).classList.toggle('hide', id !== viewId)); lucide.createIcons(); },
+            showToast: (msg) => { els.toastMsg.innerText = msg; els.toast.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => els.toast.classList.add('opacity-0', 'pointer-events-none'), 3000); },
             confirmAction: (title, desc, actionFn) => {
-                els.modalTitle.innerText = title;
-                els.modalDesc.innerText = desc;
-                state.pendingAction = actionFn;
-                els.modal.classList.remove('hide');
-                
-                // Bind confirm button once
-                const btn = document.getElementById('modal-confirm-btn');
-                btn.onclick = () => {
-                    if (state.pendingAction) state.pendingAction();
-                    window.app.closeModal();
-                };
+                els.modalTitle.innerText = title; els.modalDesc.innerText = desc; state.pendingAction = actionFn; els.modal.classList.remove('hide');
+                document.getElementById('modal-confirm-btn').onclick = () => { if (state.pendingAction) state.pendingAction(); window.app.closeModal(); };
             },
-
-            closeModal: () => {
-                els.modal.classList.add('hide');
-                state.pendingAction = null;
-            },
-
-            // --- AUTH & LOGIN ---
+            closeModal: () => { els.modal.classList.add('hide'); state.pendingAction = null; },
+            
+            // AUTH
             showAuth: () => window.app.showView('auth-view'),
-
-            selectLoginRole: (role) => {
-                state.loginRole = role;
-                // Update Login UI text/icons...
-                els.loginId.value = '';
-                els.loginPin.value = '';
-                window.app.showView('login-form-view');
-            },
-
+            selectLoginRole: (role) => { state.loginRole = role; els.loginId.value = ''; els.loginPin.value = ''; window.app.showView('login-form-view'); },
             submitLogin: async () => {
-                const id = els.loginId.value.trim();
-                const pin = els.loginPin.value.trim();
-                const btn = document.getElementById('btn-login-submit');
-
+                const id = els.loginId.value.trim(); const pin = els.loginPin.value.trim();
                 if(!id || !pin) return window.app.showToast("Enter ID & PIN");
-
-                btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> Verifying...`;
-                lucide.createIcons();
-
                 let user = null;
-                // 1. Hardcoded Admins (Always safe fallback)
+                // Demo Users
                 if(state.loginRole === 'driver' && id === 'driver' && pin === '1234') user = { id: 'd1', name: 'Ramesh Driver', role: 'driver', vehicle: 'Innova KA-01', phone:'9999999999', status: 'approved' };
                 else if(state.loginRole === 'employee' && id === 'employee' && pin === '1234') user = { id: 'e1', name: 'John Emp', role: 'employee', dept: 'Engineering', phone:'8888888888', status: 'approved' };
                 else if(state.loginRole === 'admin' && id === 'admin' && pin === '1234') user = { id: 'admin', name: 'Admin', role: 'admin', status: 'approved' };
-
-                // 2. Database Check
+                
                 if (!user) {
                     try {
                         const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
                         const q = query(usersRef, where("phone", "==", id), where("pin", "==", pin), where("role", "==", state.loginRole));
                         const snapshot = await getDocs(q);
-                        if (!snapshot.empty) {
-                            const doc = snapshot.docs[0];
-                            user = { id: doc.id, ...doc.data() };
-                        }
+                        if (!snapshot.empty) { const doc = snapshot.docs[0]; user = { id: doc.id, ...doc.data() }; }
                     } catch (e) { console.error(e); }
                 }
-
-                btn.innerHTML = `<i data-lucide="log-in"></i> Secure Login`;
-                lucide.createIcons();
-
                 if(user) {
-                    if (user.status === 'suspended') {
-                        window.app.showToast("Account Suspended. Contact Admin.");
-                        return;
-                    }
-                    if (user.status === 'pending') {
-                        state.user = user; // Temp store to show pending screen
-                        window.app.showView('pending-view');
-                        return;
-                    }
-                    state.user = user;
-                    window.app.showToast(`Welcome, ${user.name}`);
-                    window.app.routeUser();
-                } else {
-                    window.app.showToast("Invalid Credentials");
-                }
+                    if (user.status === 'suspended') return window.app.showToast("Account Suspended.");
+                    if (user.status === 'pending') { state.user = user; return window.app.showView('pending-view'); }
+                    state.user = user; window.app.showToast(`Welcome, ${user.name}`); window.app.routeUser();
+                } else window.app.showToast("Invalid Credentials");
             },
-            
             promptLogout: () => window.app.confirmAction('Log Out?', 'You will need to login again.', window.app.logout),
-            
-            logout: () => {
-                state.user = null;
-                window.app.showView('auth-view');
-            },
+            logout: () => { state.user = null; window.app.showView('auth-view'); },
 
-            // --- REGISTRATION ---
+            // REGISTRATION
             showOnboarding: () => { state.regRole = 'employee'; window.app.updateRegUI(); window.app.showView('onboarding-view'); },
             selectRegRole: (role) => { state.regRole = role; window.app.updateRegUI(); },
             updateRegUI: () => {
-                if(state.regRole === 'driver') {
-                    els.driverFields.classList.remove('hide'); els.empFields.classList.add('hide');
-                    els.btnRoleDriver.classList.add('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20'); els.btnRoleEmp.classList.remove('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20');
-                } else {
-                    els.driverFields.classList.add('hide'); els.empFields.classList.remove('hide');
-                    els.btnRoleEmp.classList.add('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20'); els.btnRoleDriver.classList.remove('border-cyan-500', 'text-cyan-500', 'bg-cyan-900/20');
-                }
+                if(state.regRole === 'driver') { els.driverFields.classList.remove('hide'); els.empFields.classList.add('hide'); } 
+                else { els.driverFields.classList.add('hide'); els.empFields.classList.remove('hide'); }
             },
             completeRegistration: async () => {
                 const name = els.regName.value; const phone = els.regPhone.value; const pin = els.regPin.value;
                 if(!name || !phone || !pin) return window.app.showToast("Fields Missing");
                 if(pin.length !== 4) return window.app.showToast("PIN must be 4 digits");
-                
-                const userData = {
-                    name, phone, pin, role: state.regRole,
-                    vehicle: els.regVehicle.value || '', plate: els.regPlate.value || '', dept: els.regDept.value || '',
-                    status: 'pending', // Default status
-                    createdAt: new Date().toISOString()
-                };
-
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), userData);
-                    window.app.showToast("Registered! Waiting for Approval.");
-                    window.app.showAuth();
-                } catch(e) { window.app.showToast("Error Registering"); }
+                const userData = { name, phone, pin, role: state.regRole, vehicle: els.regVehicle.value || '', plate: els.regPlate.value || '', dept: els.regDept.value || '', status: 'pending', createdAt: new Date().toISOString() };
+                try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), userData); window.app.showToast("Registered! Waiting for Approval."); window.app.showAuth(); } catch(e) { window.app.showToast("Error Registering"); }
             },
-
             routeUser: () => {
                 if(!state.user) return window.app.showView('auth-view');
                 if (state.user.status === 'pending') return window.app.showView('pending-view');
-                
                 if(state.user.role === 'driver') {
-                    document.getElementById('d-name').innerText = state.user.name;
-                    document.getElementById('d-vehicle').innerText = state.user.vehicle || 'Vehicle';
-                    window.app.showView('driver-view');
-                    window.app.renderDriverState();
+                    document.getElementById('d-name').innerText = state.user.name; document.getElementById('d-vehicle').innerText = state.user.vehicle || 'Vehicle'; window.app.showView('driver-view'); window.app.renderDriverState();
                 } else if(state.user.role === 'employee') {
-                    document.getElementById('e-name').innerText = state.user.name;
-                    window.app.showView('employee-view');
-                    window.app.renderEmployeeState();
-                } else {
-                    window.app.showView('admin-view');
-                    window.app.renderAdminState();
-                }
+                    document.getElementById('e-name').innerText = state.user.name; window.app.showView('employee-view'); window.app.renderEmployeeState();
+                } else { window.app.showView('admin-view'); window.app.renderAdminState(); }
             },
 
-            // --- DRIVER ACTIONS ---
+            // DRIVER ACTIONS
             capturePhoto: () => document.getElementById('camera-input').click(),
-            handlePhotoInput: (input) => { 
-                if(input.files[0]) { 
-                    state.photo = input.files[0]; 
-                    document.getElementById('btn-photo').classList.add('border-emerald-500', 'text-emerald-500');
-                    window.app.getGPSLocation(); 
-                } 
-            },
+            handlePhotoInput: (input) => { if(input.files[0]) { state.photo = input.files[0]; document.getElementById('btn-photo').classList.add('border-emerald-500', 'text-emerald-500'); window.app.getGPSLocation(); } },
             getGPSLocation: () => {
-                document.getElementById('gps-status').innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i>`; lucide.createIcons();
+                document.getElementById('gps-status').innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i>`;
                 navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6);
-                    const address = await getAddress(lat, lng);
+                    const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
                     state.gps = { lat, lng, address };
-                    document.getElementById('gps-status').innerHTML = `<i data-lucide="map-pin"></i> GPS OK`;
-                    document.getElementById('gps-status').classList.add('text-emerald-500', 'border-emerald-500');
+                    document.getElementById('gps-status').innerHTML = `<i data-lucide="map-pin"></i> GPS OK`; document.getElementById('gps-status').classList.add('text-emerald-500', 'border-emerald-500');
                     window.app.checkStartButton();
-                    lucide.createIcons();
                 });
             },
-            checkStartButton: () => {
-                if(document.getElementById('start-odo').value && state.photo && state.gps) {
-                    const btn = document.getElementById('btn-start-trip');
-                    btn.disabled = false; btn.classList.remove('bg-slate-800', 'text-slate-500'); btn.classList.add('bg-cyan-600', 'text-black', 'shadow-lg');
-                }
-            },
+            checkStartButton: () => { if(document.getElementById('start-odo').value && state.photo && state.gps) document.getElementById('btn-start-trip').disabled = false; },
             startTrip: async () => {
                 const odo = document.getElementById('start-odo').value;
                 const tripId = `TRIP-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.random().toString(36).substr(2,5).toUpperCase()}`;
-                
-                const tripData = {
-                    tripIdDisplay: tripId,
-                    driverId: state.user.id, driverName: state.user.name, vehicle: state.user.vehicle,
-                    startTime: new Date().toISOString(), startOdo: parseInt(odo),
-                    startLocation: state.gps.address, startLat: state.gps.lat, startLng: state.gps.lng,
-                    status: 'active', validationStatus: 'pending', passengers: [],
-                    stops: [{ type: 'start', time: new Date().toISOString(), lat: state.gps.lat, lng: state.gps.lng, desc: 'Started' }]
-                };
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), tripData);
-                window.app.showToast("Duty Started");
+                const tripData = { tripIdDisplay: tripId, driverId: state.user.id, driverName: state.user.name, vehicle: state.user.vehicle, startTime: new Date().toISOString(), startOdo: parseInt(odo), startLocation: state.gps.address, startLat: state.gps.lat, startLng: state.gps.lng, status: 'active', validationStatus: 'pending', passengers: [], stops: [{ type: 'start', time: new Date().toISOString(), lat: state.gps.lat, lng: state.gps.lng, desc: 'Started' }] };
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), tripData); window.app.showToast("Duty Started");
             },
             endTrip: async () => {
-                const odo = document.getElementById('end-odo').value;
-                if(!state.activeTrip || !odo) return window.app.showToast("Enter Odometer");
-                
-                // Calculate Optimal Distance (Haversine Sum of stops)
-                let calculatedDist = 0;
-                let prev = { lat: state.activeTrip.startLat, lng: state.activeTrip.startLng };
-                // Add stops
-                state.activeTrip.stops.forEach(stop => {
-                    calculatedDist += calcDist(prev.lat, prev.lng, stop.lat, stop.lng);
-                    prev = { lat: stop.lat, lng: stop.lng };
-                });
-                // Add final position
+                const odo = document.getElementById('end-odo').value; if(!state.activeTrip || !odo) return window.app.showToast("Enter Odometer");
+                let calculatedDist = 0; let prev = { lat: state.activeTrip.startLat, lng: state.activeTrip.startLng };
+                state.activeTrip.stops.forEach(stop => { calculatedDist += calcDist(prev.lat, prev.lng, stop.lat, stop.lng); prev = { lat: stop.lat, lng: stop.lng }; });
                 navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const endLat = pos.coords.latitude; const endLng = pos.coords.longitude;
-                    calculatedDist += calcDist(prev.lat, prev.lng, endLat, endLng);
-                    
-                    const claimedDist = parseInt(odo) - state.activeTrip.startOdo;
-                    
-                    const tripRef = doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id);
-                    await updateDoc(tripRef, {
-                        endTime: new Date().toISOString(), endOdo: parseInt(odo),
-                        totalKm: claimedDist, calculatedKm: calculatedDist.toFixed(1),
-                        status: 'completed',
-                        stops: arrayUnion({ type: 'end', time: new Date().toISOString(), lat: endLat, lng: endLng, desc: 'Ended' })
-                    });
-                    
-                    // Reset UI
-                    state.photo = null; state.gps = null;
-                    document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = '';
-                    window.app.showToast("Duty Ended. Stats Saved.");
+                    calculatedDist += calcDist(prev.lat, prev.lng, pos.coords.latitude, pos.coords.longitude);
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id), { endTime: new Date().toISOString(), endOdo: parseInt(odo), totalKm: parseInt(odo) - state.activeTrip.startOdo, calculatedKm: calculatedDist.toFixed(1), status: 'completed', stops: arrayUnion({ type: 'end', time: new Date().toISOString(), lat: pos.coords.latitude, lng: pos.coords.longitude, desc: 'Ended' }) });
+                    state.photo = null; state.gps = null; document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = ''; window.app.showToast("Duty Ended. Stats Saved.");
                 });
             },
-            acceptRequest: async (reqId) => {
+            acceptRequest: async (reqId, reqLat, reqLng) => {
                 const tripId = state.activeTrip ? state.activeTrip.id : null;
-                const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId);
-                await updateDoc(reqRef, {
-                    status: 'accepted', driverId: state.user.id, driverName: state.user.name,
-                    driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route',
-                    driverPhone: state.user.phone, tripId: tripId
-                });
-                window.app.showToast("Request Accepted");
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId), { status: 'accepted', driverId: state.user.id, driverName: state.user.name, driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route', driverPhone: state.user.phone, tripId: tripId });
+                window.app.showToast("Request Accepted. Added to list.");
+            },
+            markArrived: async (reqId) => {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId), { status: 'arrived', arrivedTime: new Date().toISOString() });
+                window.app.showToast("Marked Arrived. Notifying Employee.");
             },
             renderDriverState: () => {
                 const active = state.trips.find(t => t.driverId === state.user.id && t.status === 'active');
                 state.activeTrip = active;
-                // Render Requests logic same as before...
-                const pendingReqs = state.requests.filter(r => r.status === 'pending');
-                els.reqList.innerHTML = pendingReqs.length ? pendingReqs.map(r => `
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
-                        <div><p class="font-bold text-sm text-white">${r.employeeName}</p><p class="text-xs text-slate-400 max-w-[150px] truncate">${r.pickupAddress}</p></div>
-                        <div class="flex gap-2">
-                            <a href="tel:${r.employeePhone}" class="bg-slate-700 p-2 rounded-lg"><i data-lucide="phone" class="w-4 h-4 text-green-400"></i></a>
-                            <button onclick="window.app.confirmAction('Accept Ride?', 'Confirm you are going.', () => window.app.acceptRequest('${r.id}'))" class="bg-cyan-600 text-black text-xs font-bold px-3 py-2 rounded-lg">Accept</button>
-                        </div>
-                    </div>`).join('') : `<p class="text-xs text-slate-500 text-center italic">No pending requests</p>`;
+                
+                // Show accepted/pending pickups
+                const myReqs = state.requests.filter(r => (r.status === 'pending') || (r.status === 'accepted' && r.driverId === state.user.id) || (r.status === 'arrived' && r.driverId === state.user.id));
+                
+                els.reqList.innerHTML = myReqs.length ? myReqs.map(r => {
+                    if (r.status === 'pending') {
+                        // Pending card
+                        return `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center"><div><p class="font-bold text-sm text-white">${r.employeeName}</p><p class="text-xs text-slate-400 truncate max-w-[150px]">${r.pickupAddress}</p></div><button onclick="window.app.confirmAction('Accept?', 'Add to stops.', () => window.app.acceptRequest('${r.id}'))" class="bg-cyan-600 text-black text-xs font-bold px-3 py-2 rounded-lg">Accept</button></div>`;
+                    } else if (r.status === 'accepted') {
+                        // Accepted card (With distance)
+                        const dist = state.gps ? calcDist(state.gps.lat, state.gps.lng, r.pickupLat, r.pickupLng).toFixed(1) : '?';
+                        return `<div class="bg-blue-900/30 p-4 rounded-xl border border-blue-500/50"><div class="flex justify-between items-start mb-2"><div><p class="font-bold text-sm text-blue-300">Next Pickup: ${r.employeeName}</p><p class="text-xs text-slate-400">${dist} km away</p></div><button onclick="window.app.confirmAction('Arrived?', 'Notify employee.', () => window.app.markArrived('${r.id}'))" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Mark Arrived</button></div><p class="text-[10px] text-slate-500 truncate"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${r.pickupAddress}</p></div>`;
+                    } else if (r.status === 'arrived') {
+                        return `<div class="bg-green-900/30 p-4 rounded-xl border border-green-500/50 text-center"><p class="font-bold text-green-400">Waiting for ${r.employeeName}...</p><p class="text-xs text-slate-500">You marked arrived.</p></div>`;
+                    }
+                }).join('') : `<p class="text-xs text-slate-500 text-center italic">No pickups</p>`;
 
                 if(active) {
                     document.getElementById('driver-idle').classList.add('hide'); document.getElementById('driver-active').classList.remove('hide');
@@ -792,35 +652,39 @@
                 lucide.createIcons();
             },
 
-            // --- EMPLOYEE ACTIONS ---
+            // EMPLOYEE ACTIONS
             requestPickup: () => {
                 const btn = document.getElementById('btn-request-pickup'); btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i>...`;
                 navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6);
-                    const address = await getAddress(lat, lng);
+                    const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), {
-                        employeeId: state.user.id, employeeName: state.user.name, employeePhone: state.user.phone || '',
-                        pickupLat: lat, pickupLng: lng, pickupAddress: address, status: 'pending', timestamp: new Date().toISOString()
+                        employeeId: state.user.id, employeeName: state.user.name, employeePhone: state.user.phone || '', pickupLat: lat, pickupLng: lng, pickupAddress: address, status: 'pending', timestamp: new Date().toISOString()
                     });
                     btn.innerHTML = `<i data-lucide="map-pin"></i> Request Pickup`;
                 });
             },
             refreshDriverLoc: () => { window.app.showToast("Refreshed."); window.app.renderEmployeeState(); },
             boardCabFromRequest: () => {
-                const myReq = state.requests.find(r => r.employeeId === state.user.id && r.status === 'accepted');
-                if (myReq && myReq.tripId) window.app.joinTrip(myReq.tripId);
-                else window.app.showToast("No active trip found for this acceptance.");
+                const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
+                if (myReq) window.app.joinTrip(myReq.tripId || null); // Fallback to null will trigger error in joinTrip
+                else window.app.showToast("No active trip found.");
             },
             joinTrip: async (tripId) => {
+                if(!tripId) return window.app.showToast("Error: Trip ID missing.");
                 window.app.showToast("Boarding...");
+                
+                // Get Request Data to calculate wait time
+                const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
+                const arrivalTime = myReq && myReq.arrivedTime ? new Date(myReq.arrivedTime) : new Date();
+                const boardTime = new Date();
+                const waitMins = Math.round((boardTime - arrivalTime) / 60000); // mins
+
                 navigator.geolocation.getCurrentPosition(async (pos) => {
                     const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), {
-                        passengers: arrayUnion({ id: state.user.id, name: state.user.name }),
-                        stops: arrayUnion({ type: 'pickup', time: new Date().toISOString(), lat, lng, desc: `Pickup: ${state.user.name} at ${address}` })
+                        passengers: arrayUnion({ id: state.user.id, name: state.user.name, boardTime: boardTime.toISOString(), waitTime: waitMins }),
+                        stops: arrayUnion({ type: 'pickup', time: boardTime.toISOString(), lat, lng, desc: `Pickup: ${state.user.name} (Wait: ${waitMins}m)` })
                     });
-                    // Close request
-                    const myReq = state.requests.find(r => r.employeeId === state.user.id && r.status === 'accepted');
                     if (myReq) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', myReq.id), { status: 'completed' });
                 });
             },
@@ -839,153 +703,92 @@
             renderEmployeeState: () => {
                 const myTrip = state.trips.find(t => t.status === 'active' && t.passengers?.some(p => p.id === state.user.id));
                 state.myTrip = myTrip;
-                const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'pending' || r.status === 'accepted'));
+                const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'pending' || r.status === 'accepted' || r.status === 'arrived'));
                 
                 if(myTrip) {
                     document.getElementById('employee-idle').classList.add('hide'); document.getElementById('employee-request-ui').classList.add('hide'); document.getElementById('employee-onboard').classList.remove('hide');
-                    document.getElementById('onboard-driver').innerText = myTrip.driverName;
-                    document.getElementById('onboard-vehicle').innerText = myTrip.vehicle;
-                    document.getElementById('onboard-loc').innerText = `Trip: ${myTrip.tripIdDisplay || 'Active'}`;
+                    els.onboardDriver.innerText = myTrip.driverName; els.onboardVehicle.innerText = myTrip.vehicle; els.onboardLoc.innerText = `Started at ${myTrip.startLocation}`;
+                    
+                    // WHATSAPP LINK GENERATION
+                    const myPassengerData = myTrip.passengers.find(p => p.id === state.user.id);
+                    const waitTime = myPassengerData ? myPassengerData.waitTime : 0;
+                    const waText = `Hi, I am ${state.user.name}. I have boarded Cab ${myTrip.vehicle} (Driver: ${myTrip.driverName}) from ${myTrip.startLocation} at ${new Date().toLocaleTimeString()}. Wait Time: ${waitTime} mins.`;
+                    els.btnShareWa.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
                 } else if (myReq) {
                     document.getElementById('employee-idle').classList.add('hide'); document.getElementById('employee-onboard').classList.add('hide'); document.getElementById('employee-request-ui').classList.remove('hide');
                     if(myReq.status === 'pending') {
                         els.reqPending.classList.remove('hide'); els.reqAccepted.classList.add('hide'); els.reqIdle.classList.add('hide');
-                    } else {
+                    } else if (myReq.status === 'accepted' || myReq.status === 'arrived') {
                         els.reqPending.classList.add('hide'); els.reqAccepted.classList.remove('hide'); els.reqIdle.classList.add('hide');
                         els.reqDriverName.innerText = myReq.driverName;
                         els.reqCallBtn.href = `tel:${myReq.driverPhone}`;
-                        // Live update loc logic...
+                        // Logic for Arrived State
+                        if(myReq.status === 'arrived') {
+                            els.reqStatusText.innerText = "Driver is Here!";
+                            els.reqStatusText.className = "font-bold text-green-600 text-lg animate-pulse";
+                            els.reqWaitingUi.classList.add('hide');
+                            els.reqBoardingUi.classList.remove('hide');
+                        } else {
+                            els.reqStatusText.innerText = "Cab Arriving";
+                            els.reqStatusText.className = "font-bold text-green-800 text-sm";
+                            els.reqWaitingUi.classList.remove('hide');
+                            els.reqBoardingUi.classList.add('hide');
+                        }
                         const driverTrip = state.trips.find(t => t.driverId === myReq.driverId && t.status === 'active');
                         els.reqDriverLoc.innerText = driverTrip ? driverTrip.startLocation : myReq.driverLoc;
                     }
                 } else {
                     document.getElementById('employee-idle').classList.remove('hide'); document.getElementById('employee-onboard').classList.add('hide'); document.getElementById('employee-request-ui').classList.remove('hide');
                     els.reqIdle.classList.remove('hide'); els.reqPending.classList.add('hide'); els.reqAccepted.classList.add('hide');
-                    // Cab List logic... (Active trips around)
                     const activeTrips = state.trips.filter(t => t.status === 'active');
                     els.cabList.innerHTML = activeTrips.length ? activeTrips.map(t => `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center"><div><h3 class="font-bold text-slate-800">${t.driverName}</h3><p class="text-xs text-slate-500">${t.startLocation}</p></div><button onclick="window.app.confirmAction('Join Ride?', 'Confirm boarding.', () => window.app.joinTrip('${t.id}'))" class="bg-slate-900 text-white py-2 px-4 rounded-xl text-xs">Join</button></div>`).join('') : `<p class="text-center text-slate-400 py-4">No active cabs nearby.</p>`;
                 }
                 lucide.createIcons();
             },
 
-            // --- ADMIN ACTIONS ---
+            // ADMIN ACTIONS
             setAdminTab: (tab) => {
                 document.getElementById('tab-trips').className = tab==='trips' ? 'flex-1 py-3 border-b-2 border-emerald-500 text-emerald-600' : 'flex-1 py-3 border-b-2 border-transparent hover:text-slate-800';
                 document.getElementById('tab-users').className = tab==='users' ? 'flex-1 py-3 border-b-2 border-emerald-500 text-emerald-600' : 'flex-1 py-3 border-b-2 border-transparent hover:text-slate-800';
-                document.getElementById('admin-tab-trips').classList.toggle('hide', tab!=='trips');
-                document.getElementById('admin-tab-users').classList.toggle('hide', tab!=='users');
+                document.getElementById('admin-tab-trips').classList.toggle('hide', tab!=='trips'); document.getElementById('admin-tab-users').classList.toggle('hide', tab!=='users');
             },
-            
-            updateUserStatus: async (uid, newStatus) => {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { status: newStatus });
-                window.app.showToast(`User ${newStatus}`);
-            },
-
-            validateTrip: async (tripId, status) => {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), { validationStatus: status });
-                window.app.showToast(`Trip ${status}`);
-            },
-
+            updateUserStatus: async (uid, newStatus) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { status: newStatus }); window.app.showToast(`User ${newStatus}`); },
+            validateTrip: async (tripId, status) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), { validationStatus: status }); window.app.showToast(`Trip ${status}`); },
             renderAdminState: () => {
-                // Users Tab
-                els.adminUserList.innerHTML = state.usersList.map(u => `
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-sm ${u.status==='pending'?'text-orange-600':u.status==='suspended'?'text-red-500':'text-slate-800'}">${u.name} <span class="text-[10px] uppercase border px-1 rounded ml-1">${u.role}</span></p>
-                            <p class="text-xs text-slate-500">${u.phone} • ${u.status}</p>
-                        </div>
-                        <div class="flex gap-1">
-                            ${u.status==='pending' || u.status==='suspended' ? `<button onclick="window.app.updateUserStatus('${u.id}', 'approved')" class="p-2 bg-emerald-100 text-emerald-700 rounded"><i data-lucide="check" class="w-3 h-3"></i></button>` : ''}
-                            ${u.status==='approved' ? `<button onclick="window.app.confirmAction('Suspend User?', 'They cannot login.', () => window.app.updateUserStatus('${u.id}', 'suspended'))" class="p-2 bg-red-100 text-red-700 rounded"><i data-lucide="ban" class="w-3 h-3"></i></button>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-
-                // Trips Tab
+                els.adminUserList.innerHTML = state.usersList.map(u => `<div class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center"><div><p class="font-bold text-sm ${u.status==='pending'?'text-orange-600':u.status==='suspended'?'text-red-500':'text-slate-800'}">${u.name} <span class="text-[10px] uppercase border px-1 rounded ml-1">${u.role}</span></p><p class="text-xs text-slate-500">${u.phone} • ${u.status}</p></div><div class="flex gap-1">${u.status==='pending'||u.status==='suspended'?`<button onclick="window.app.updateUserStatus('${u.id}', 'approved')" class="p-2 bg-emerald-100 text-emerald-700 rounded"><i data-lucide="check" class="w-3 h-3"></i></button>`:''}${u.status==='approved'?`<button onclick="window.app.confirmAction('Suspend User?', 'They cannot login.', () => window.app.updateUserStatus('${u.id}', 'suspended'))" class="p-2 bg-red-100 text-red-700 rounded"><i data-lucide="ban" class="w-3 h-3"></i></button>`:''}</div></div>`).join('');
                 els.adminTripList.innerHTML = state.trips.map(t => {
                     const variance = t.totalKm && t.calculatedKm ? (t.totalKm - t.calculatedKm).toFixed(1) : 0;
-                    const varianceColor = variance > 5 ? 'text-red-600' : 'text-green-600';
-                    const isValidated = t.validationStatus === 'valid';
-                    const isFlagged = t.validationStatus === 'flagged';
-
-                    return `
-                    <div class="bg-white p-4 rounded-xl border ${isValidated ? 'border-emerald-500 bg-emerald-50' : isFlagged ? 'border-red-500 bg-red-50' : 'border-slate-200'}">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <p class="text-xs font-mono text-slate-400">${t.tripIdDisplay || t.id.substr(0,8)}</p>
-                                <p class="font-bold text-sm">${t.driverName}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs font-bold ${t.status==='active'?'text-green-600':'text-slate-500'} uppercase">${t.status}</p>
-                                <p class="text-[10px] text-slate-400">${new Date(t.startTime).toLocaleDateString()}</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 text-xs mb-3 bg-slate-50 p-2 rounded">
-                            <div><span class="block text-slate-400">Claimed</span><span class="font-bold">${t.totalKm || 0} km</span></div>
-                            <div><span class="block text-slate-400">Calc</span><span class="font-bold">${t.calculatedKm || 0} km</span></div>
-                            <div><span class="block text-slate-400">Var</span><span class="font-bold ${varianceColor}">${variance} km</span></div>
-                        </div>
-                        <div class="flex gap-2 justify-end">
-                            ${!isValidated ? `<button onclick="window.app.validateTrip('${t.id}', 'valid')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Validate</button>` : ''}
-                            ${!isFlagged ? `<button onclick="window.app.confirmAction('Flag Trip?', 'Mark as suspicious.', () => window.app.validateTrip('${t.id}', 'flagged'))" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded">Flag</button>` : ''}
-                        </div>
-                    </div>`
+                    return `<div class="bg-white p-4 rounded-xl border ${t.validationStatus === 'valid' ? 'border-emerald-500 bg-emerald-50' : t.validationStatus === 'flagged' ? 'border-red-500 bg-red-50' : 'border-slate-200'}"><div class="flex justify-between items-start mb-2"><div><p class="text-xs font-mono text-slate-400">${t.tripIdDisplay || t.id.substr(0,8)}</p><p class="font-bold text-sm">${t.driverName}</p></div><div class="text-right"><p class="text-xs font-bold ${t.status==='active'?'text-green-600':'text-slate-500'} uppercase">${t.status}</p><p class="text-[10px] text-slate-400">${new Date(t.startTime).toLocaleDateString()}</p></div></div><div class="grid grid-cols-3 gap-2 text-xs mb-3 bg-slate-50 p-2 rounded"><div><span class="block text-slate-400">Claimed</span><span class="font-bold">${t.totalKm || 0} km</span></div><div><span class="block text-slate-400">Calc</span><span class="font-bold">${t.calculatedKm || 0} km</span></div><div><span class="block text-slate-400">Var</span><span class="font-bold ${variance>5?'text-red-600':'text-green-600'}">${variance} km</span></div></div><div class="flex gap-2 justify-end">${t.validationStatus!=='valid'?`<button onclick="window.app.validateTrip('${t.id}', 'valid')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Validate</button>`:''}${t.validationStatus!=='flagged'?`<button onclick="window.app.confirmAction('Flag Trip?', 'Mark as suspicious.', () => window.app.validateTrip('${t.id}', 'flagged'))" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded">Flag</button>`:''}</div></div>`;
                 }).join('');
                 lucide.createIcons();
             },
-            
             downloadCSV: () => {
                 const headers = ["TripID,Driver,Date,ClaimedKM,CalcKM,Variance,Status,Validation"];
-                const rows = state.trips.map(t => {
-                    const variance = t.totalKm && t.calculatedKm ? (t.totalKm - t.calculatedKm).toFixed(1) : 0;
-                    return `${t.tripIdDisplay},${t.driverName},${t.startTime},${t.totalKm||0},${t.calculatedKm||0},${variance},${t.status},${t.validationStatus||'pending'}`;
-                });
-                const content = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n');
-                const link = document.createElement("a"); link.setAttribute("href", encodeURI(content)); link.setAttribute("download", "fleet_audit.csv");
-                document.body.appendChild(link); link.click();
+                const rows = state.trips.map(t => { const variance = t.totalKm && t.calculatedKm ? (t.totalKm - t.calculatedKm).toFixed(1) : 0; return `${t.tripIdDisplay},${t.driverName},${t.startTime},${t.totalKm||0},${t.calculatedKm||0},${variance},${t.status},${t.validationStatus||'pending'}`; });
+                const content = "data:text/csv;charset=utf-8," + [headers, ...rows].join('\n'); const link = document.createElement("a"); link.setAttribute("href", encodeURI(content)); link.setAttribute("download", "fleet_audit.csv"); document.body.appendChild(link); link.click();
             }
         };
 
-        // --- INIT & LIVE CLOCK ---
-        setInterval(() => {
-            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
-
+        // INIT
+        setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
         const init = async () => {
             setTimeout(() => { if (!document.getElementById('loading-view').classList.contains('hide')) document.getElementById('loading-error').classList.remove('hide'); }, 5000);
             try { await signInAnonymously(auth); } catch (e) { console.error("Auth Failed:", e); }
-            
-            // Listen to Trips (Limit for Free Tier)
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), orderBy('startTime', 'desc'), limit(50)), (snap) => {
-                state.trips = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if(state.user) window.app.routeUser();
-                document.getElementById('loading-view').classList.add('hide');
-                if(!state.user) window.app.showAuth();
+                state.trips = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user) window.app.routeUser(); document.getElementById('loading-view').classList.add('hide'); if(!state.user) window.app.showAuth();
             });
-
-            // Listen to Requests
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), orderBy('timestamp', 'desc'), limit(50)), (snap) => {
-                state.requests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if(state.user) window.app.routeUser();
+                state.requests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user) window.app.routeUser();
             });
-
-            // Listen to Users (For Admin)
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), orderBy('createdAt', 'desc'), limit(100)), (snap) => {
-                state.usersList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if(state.user && state.user.role === 'admin') window.app.renderAdminState();
+                state.usersList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user && state.user.role === 'admin') window.app.renderAdminState();
             });
-
-            // Location Watcher
-            if("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(async (pos) => {
-                    const addr = await getAddress(pos.coords.latitude, pos.coords.longitude);
-                    document.getElementById('live-location').innerText = addr.split(',')[0];
-                }, null, { enableHighAccuracy: false, maximumAge: 30000, timeout: 27000 });
-            }
-
+            if("geolocation" in navigator) navigator.geolocation.watchPosition(async (pos) => {
+                const addr = await getAddress(pos.coords.latitude, pos.coords.longitude); document.getElementById('live-location').innerText = addr.split(',')[0];
+            }, null, { enableHighAccuracy: false, maximumAge: 30000, timeout: 27000 });
             lucide.createIcons();
         };
-
         init();
     </script>
 </body>

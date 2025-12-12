@@ -386,7 +386,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, arrayUnion, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, arrayUnion, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURATION ---
         const firebaseConfig = {
@@ -1040,7 +1040,7 @@
             }
             
             // Listen to Trips
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), orderBy('startTime', 'desc'));
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), orderBy('startTime', 'desc'), limit(50));
             onSnapshot(q, (snapshot) => {
                 state.trips = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 if(state.user) window.app.routeUser();
@@ -1049,7 +1049,7 @@
             }, (err) => console.error(err));
 
             // Listen to Requests (New)
-            const qReq = query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), orderBy('timestamp', 'desc'));
+            const qReq = query(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), orderBy('timestamp', 'desc'), limit(50));
             onSnapshot(qReq, (snapshot) => {
                 state.requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 if(state.user) window.app.routeUser(); // Re-render to update UI

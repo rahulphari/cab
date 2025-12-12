@@ -15,7 +15,7 @@
         .show { display: block !important; }
         .bilingual-sub { font-size: 0.8em; opacity: 0.7; display: block; font-weight: normal; }
         
-        /* Smooth transitions for views */
+        /* Smooth transitions */
         .view-section { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -28,6 +28,11 @@
 
         /* Modal Overlay */
         #modal-overlay { background-color: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
+        
+        /* Processing Overlay */
+        #processing-overlay { background-color: rgba(15, 23, 42, 0.9); backdrop-filter: blur(5px); z-index: 100; }
+        .pulse-ring { border: 4px solid #22d3ee; border-radius: 50%; animation: pulse-ring 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.33); opacity: 1; } 80%, 100% { transform: scale(1); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -52,6 +57,16 @@
             <span id="toast-msg" class="text-sm font-bold truncate">Notification</span>
         </div>
 
+        <!-- PROCESSING OVERLAY -->
+        <div id="processing-overlay" class="fixed inset-0 hide flex flex-col items-center justify-center">
+            <div class="relative w-16 h-16 flex items-center justify-center mb-4">
+                <div class="pulse-ring absolute inset-0"></div>
+                <i data-lucide="zap" class="w-6 h-6 text-cyan-400 relative z-10"></i>
+            </div>
+            <h3 class="text-cyan-400 font-bold text-lg animate-pulse">Processing...</h3>
+            <p class="text-slate-500 text-xs mt-1">Synchronizing with Fleet Command</p>
+        </div>
+
         <!-- CONFIRMATION MODAL -->
         <div id="modal-overlay" class="fixed inset-0 z-[60] hide flex items-center justify-center p-6">
             <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl transform scale-100 transition-transform">
@@ -59,6 +74,9 @@
                     <h3 id="modal-title" class="text-lg font-bold text-white">Confirm Action</h3>
                     <p id="modal-desc" class="text-sm text-slate-400 mt-1">Are you sure?</p>
                 </div>
+                <!-- Extra content for location selection -->
+                <div id="modal-content" class="mb-4"></div>
+                
                 <div class="flex gap-3">
                     <button onclick="window.app.closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold">Cancel</button>
                     <button id="modal-confirm-btn" class="flex-1 py-3 rounded-xl bg-cyan-600 text-black font-bold shadow-lg">Confirm</button>
@@ -75,12 +93,13 @@
         </div>
 
         <!-- AUTH ROLE SELECTION VIEW -->
-        <div id="auth-view" class="view-section hide flex-1 flex flex-col items-center justify-center p-6 space-y-6">
-            <div class="text-center mb-8">
+        <div id="auth-view" class="view-section hide flex-1 flex flex-col items-center justify-center p-6 space-y-4">
+            <div class="text-center mb-6">
                 <h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1>
                 <p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p>
             </div>
 
+            <!-- Driver Card -->
             <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95">
                 <div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400"><i data-lucide="car"></i></div>
                 <div class="text-left">
@@ -89,21 +108,29 @@
                 </div>
             </button>
 
+            <!-- Employee Card (Admins use this to request rides) -->
             <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95">
                 <div class="bg-purple-900/30 p-3 rounded-full text-purple-400"><i data-lucide="users"></i></div>
                 <div class="text-left">
                     <h3 class="font-bold text-lg">Employee Login</h3>
-                    <span class="bilingual-sub">ಉದ್ಯೋಗಿ ಲಾಗಿನ್</span>
+                    <span class="bilingual-sub">ಉದ್ಯೋಗಿ (ಸವಾರಿ ವಿನಂತಿಸಿ)</span>
+                </div>
+            </button>
+
+            <!-- Admin Card (Dedicated) -->
+            <button onclick="window.app.selectLoginRole('admin')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500 flex items-center gap-4 transition-all active:scale-95">
+                <div class="bg-emerald-900/30 p-3 rounded-full text-emerald-400"><i data-lucide="shield"></i></div>
+                <div class="text-left">
+                    <h3 class="font-bold text-lg">Admin Panel</h3>
+                    <span class="bilingual-sub">ನಿರ್ವಾಹಕರು (ವ್ಯವಸ್ಥಾಪಕರು)</span>
                 </div>
             </button>
 
             <div class="w-full h-px bg-slate-800 my-4"></div>
 
             <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2">
-                <i data-lucide="user-plus"></i> New User / ಹೊಸ ಬಳಕೆದಾರ
+                <i data-lucide="user-plus"></i> Register New User / ಹೊಸ ಬಳಕೆದಾರ
             </button>
-            
-            <button onclick="window.app.selectLoginRole('admin')" class="text-xs text-slate-600 mt-4">Admin Access / ನಿರ್ವಾಹಕರು</button>
         </div>
 
         <!-- LOGIN & PIN VIEW -->
@@ -116,13 +143,12 @@
                 </div>
                 <h2 id="login-title" class="text-2xl font-bold">Login</h2>
                 <p class="text-slate-400 text-sm">Enter Credentials / ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ</p>
-                <p class="text-[10px] text-slate-600 mt-2 bg-slate-900 inline-block px-2 py-1 rounded">Demo PIN: 1234</p>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="text-xs text-slate-400 uppercase font-bold ml-1">Phone Number / ID</label>
-                    <input type="text" id="login-id" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-lg focus:border-cyan-500 outline-none" placeholder="Enter ID">
+                    <label class="text-xs text-slate-400 uppercase font-bold ml-1">Phone Number (ID)</label>
+                    <input type="tel" id="login-id" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-lg focus:border-cyan-500 outline-none" placeholder="Enter Phone">
                 </div>
 
                 <div>
@@ -141,40 +167,64 @@
             <h2 class="text-2xl font-bold mb-6">Setup Profile <span class="bilingual-sub">ಪ್ರೊಫೈಲ್ ರಚಿಸಿ</span></h2>
             <div class="space-y-4 overflow-y-auto max-h-[80vh] pb-10">
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Full Name / ಪೂರ್ಣ ಹೆಸರು</label>
-                    <input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. Raju Kumar">
+                    <label class="text-xs text-slate-400 uppercase">Full Name</label>
+                    <input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 outline-none" placeholder="e.g. Raju Kumar">
                 </div>
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Phone (Login ID) / ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label>
-                    <input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. 9876543210">
+                    <label class="text-xs text-slate-400 uppercase">Phone (Login ID)</label>
+                    <input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 outline-none" placeholder="e.g. 9876543210">
                 </div>
                 <div>
-                    <label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN / ಪಿನ್ ಸೆಟ್ ಮಾಡಿ</label>
-                    <input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••">
+                    <label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN</label>
+                    <input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest outline-none" placeholder="••••">
                 </div>
+                
+                <!-- Saved Locations (Only for Staff) -->
+                <div id="reg-locations-section" class="hide border border-slate-700 rounded-xl p-4 bg-slate-800/50">
+                    <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="map-pin"></i> Preferred Locations</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="loc-day-addr" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg" placeholder="Day Pickup (e.g. Home)" readonly>
+                            <button onclick="window.app.captureProfileLoc('day')" class="bg-yellow-600/20 text-yellow-500 p-2 rounded-lg border border-yellow-600/50"><i data-lucide="sun"></i></button>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="loc-night-addr" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg" placeholder="Night Pickup (e.g. Relative)" readonly>
+                            <button onclick="window.app.captureProfileLoc('night')" class="bg-indigo-600/20 text-indigo-400 p-2 rounded-lg border border-indigo-600/50"><i data-lucide="moon"></i></button>
+                        </div>
+                        <p class="text-[10px] text-slate-500 italic">Tap icon to capture current GPS location</p>
+                    </div>
+                </div>
+
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Role / ಪಾತ್ರ</label>
+                    <label class="text-xs text-slate-400 uppercase">Category</label>
                     <div class="grid grid-cols-2 gap-3 mt-1">
                         <button onclick="window.app.selectRegRole('driver')" id="btn-role-driver" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2">
                             <i data-lucide="car"></i> Driver
                         </button>
-                        <button onclick="window.app.selectRegRole('employee')" id="btn-role-employee" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2">
-                            <i data-lucide="briefcase"></i> Employee
+                        <button onclick="window.app.selectRegRole('staff')" id="btn-role-staff" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2">
+                            <i data-lucide="briefcase"></i> Staff
                         </button>
                     </div>
                 </div>
+                
                 <div id="reg-driver-fields" class="hide space-y-4">
-                    <input type="text" id="reg-vehicle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Vehicle Model (e.g. Innova)">
-                    <input type="text" id="reg-plate" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Plate No (e.g. KA-01-AB-1234)">
+                    <input type="text" id="reg-vehicle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Vehicle Model">
+                    <input type="text" id="reg-plate" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Plate No">
                 </div>
-                <div id="reg-employee-fields" class="hide">
-                    <select id="reg-dept" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none">
-                        <option value="">Select Department / ಇಲಾಖೆ</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="HR">HR</option>
-                        <option value="Sales">Sales</option>
+                
+                <div id="reg-staff-fields" class="hide">
+                    <label class="text-xs text-slate-400 uppercase mb-1 block">Designation</label>
+                    <select id="reg-designation" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none text-white">
+                        <option value="Ground Coordinator">Ground Coordinator</option>
+                        <option value="Process Executive">Process Executive</option>
+                        <option value="Team Leader">Team Leader</option>
+                        <option value="Manager">Manager (Admin)</option>
+                        <option value="Senior Manager">Senior Manager (Admin)</option>
+                        <option value="Director">Director (Admin)</option>
                     </select>
                 </div>
+
                 <div class="flex gap-3 mt-6">
                     <button onclick="window.app.showAuth()" class="flex-1 p-4 rounded-xl bg-slate-800 text-slate-400 font-bold">Cancel</button>
                     <button onclick="window.app.completeRegistration()" class="flex-[2] p-4 rounded-xl bg-cyan-600 text-black font-bold shadow-lg shadow-cyan-900/50">Register</button>
@@ -188,8 +238,8 @@
                 <i data-lucide="clock" class="w-12 h-12"></i>
             </div>
             <h2 class="text-2xl font-bold mb-2">Registration Pending</h2>
-            <p class="text-slate-400">Your account is waiting for Admin approval.<br>Please contact your supervisor.</p>
-            <button onclick="window.app.logout()" class="mt-8 text-slate-500 hover:text-white">Go Back</button>
+            <p class="text-slate-400">Your account is waiting for Manager approval.<br>Please contact your supervisor.</p>
+            <button onclick="window.app.promptLogout()" class="mt-8 text-slate-500 hover:text-white">Go Back</button>
         </div>
 
         <!-- DRIVER DASHBOARD -->
@@ -206,6 +256,23 @@
             </header>
 
             <div class="p-4 space-y-6">
+                <!-- REQUESTS SECTION -->
+                <div id="driver-requests" class="space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Pickup Requests
+                    </h3>
+                    <div id="requests-list" class="space-y-3"></div>
+                </div>
+                
+                <!-- ROUTE SUGGESTION -->
+                <div id="route-suggestion" class="hide bg-slate-900 p-4 rounded-xl border border-slate-700">
+                    <h3 class="text-sm font-bold text-emerald-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="map"></i> Suggested Route
+                    </h3>
+                    <div id="route-steps" class="text-xs text-slate-300 space-y-2 font-mono"></div>
+                    <div id="route-total" class="mt-3 pt-2 border-t border-slate-800 text-xs font-bold text-right text-slate-400"></div>
+                </div>
+
                 <!-- IDLE STATE -->
                 <div id="driver-idle" class="space-y-6">
                     <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-center">
@@ -214,7 +281,7 @@
                         
                         <div class="space-y-4 text-left">
                             <div>
-                                <label class="text-xs text-slate-400">START ODOMETER / ಆರಂಭಿಕ ರೀಡಿಂಗ್</label>
+                                <label class="text-xs text-slate-400">START ODOMETER</label>
                                 <input type="number" id="start-odo" class="w-full bg-slate-800 rounded-xl p-3 text-2xl font-mono border border-slate-700 focus:border-cyan-500 outline-none" placeholder="00000">
                             </div>
                             
@@ -243,18 +310,8 @@
                     <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 border border-emerald-800 relative overflow-hidden shadow-xl">
                         <div class="absolute top-4 right-4 animate-pulse"><div class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]"></div></div>
                         <span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE / ಚಾಲನೆಯಲ್ಲಿದೆ</span>
-                        <h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00</h1>
+                        <h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00:00</h1>
                         <p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1 font-mono break-words leading-tight"><i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> Locating...</p>
-                    </div>
-
-                    <!-- REQUESTS SECTION IN TRIP -->
-                    <div class="space-y-2">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                            <i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Next Pickups
-                        </h3>
-                        <div id="requests-list" class="space-y-3">
-                            <!-- Request items injected here -->
-                        </div>
                     </div>
 
                     <!-- Timeline -->
@@ -263,13 +320,11 @@
                             <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
                             <span class="text-sm font-bold text-slate-300">Live Timeline <span class="bilingual-sub inline ml-2">ಟೈಮ್‌ಲೈನ್</span></span>
                         </div>
-                        <div id="trip-timeline" class="space-y-4 pl-2 border-l border-slate-800 ml-2">
-                            <!-- Timeline items injected here -->
-                        </div>
+                        <div id="trip-timeline" class="space-y-4 pl-2 border-l border-slate-800 ml-2"></div>
                     </div>
 
                     <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800">
-                        <label class="text-xs text-slate-400">END ODOMETER / ಅಂತಿಮ ರೀಡಿಂಗ್</label>
+                        <label class="text-xs text-slate-400">END ODOMETER</label>
                         <div class="flex gap-3 mt-2">
                             <input type="number" id="end-odo" class="flex-1 bg-slate-800 rounded-xl p-3 text-xl font-mono border border-slate-700 outline-none" placeholder="00000">
                             <button onclick="window.app.confirmAction('End Shift?', 'This will finalize your log.', window.app.endTrip)" class="bg-red-600 px-6 rounded-xl text-white shadow-lg active:scale-95"><i data-lucide="check-circle"></i></button>
@@ -283,10 +338,13 @@
         <div id="employee-view" class="view-section hide min-h-screen bg-slate-50 text-slate-900 overflow-y-auto">
             <nav class="bg-white shadow-sm p-4 sticky top-0 z-20 flex justify-between items-center">
                 <div>
-                    <h2 class="font-bold text-blue-600">Commute<span class="text-slate-400">Sync</span></h2>
-                    <span class="text-[10px] text-slate-400 block">Employee App / ಉದ್ಯೋಗಿ</span>
+                    <h2 class="font-bold text-blue-600">Cab<span class="text-slate-400">Sight</span></h2>
+                    <span class="text-[10px] text-slate-400 block" id="emp-role-display">Employee App</span>
                 </div>
                 <div class="flex items-center gap-2">
+                    <!-- Quick Switch for Admins -->
+                    <button id="btn-admin-switch" onclick="window.app.switchToAdmin()" class="hide bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><i data-lucide="shield"></i> Admin</button>
+                    
                     <span id="e-name" class="text-sm font-bold text-slate-700 hidden md:block">User</span>
                     <button onclick="window.app.promptLogout()" class="bg-slate-100 p-2 rounded-full text-slate-600"><i data-lucide="log-out" class="w-4 h-4"></i></button>
                 </div>
@@ -298,7 +356,7 @@
                     <div id="req-idle">
                         <h3 class="font-bold text-lg text-slate-800 mb-2">Need a Ride?</h3>
                         <p class="text-xs text-slate-500 mb-4">Request a cab to your current location.</p>
-                        <button onclick="window.app.confirmAction('Request Ride?', 'Drivers will see your location.', window.app.requestPickup)" id="btn-request-pickup" class="w-full bg-blue-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+                        <button onclick="window.app.initiatePickupRequest()" id="btn-request-pickup" class="w-full bg-blue-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
                             <i data-lucide="map-pin"></i> Request Pickup / ಪಿಕಪ್ ವಿನಂತಿಸಿ
                         </button>
                     </div>
@@ -326,7 +384,7 @@
                             <span id="req-driver-loc" class="font-mono">Driver Location...</span>
                         </div>
 
-                        <!-- BOARDING UI (Hidden until driver arrives) -->
+                        <!-- BOARDING UI -->
                         <div id="req-boarding-ui" class="hide border-t border-green-200 pt-4 mt-2">
                             <p class="text-xs font-bold text-slate-600 mb-2 text-center">Driver is here!</p>
                             <button onclick="window.app.confirmAction('Board Cab?', 'Confirm you are inside.', window.app.boardCabFromRequest)" class="w-full bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95">
@@ -346,9 +404,7 @@
                 <!-- NOT ONBOARD -->
                 <div id="employee-idle" class="space-y-4">
                     <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2"><i data-lucide="rss" class="w-4 h-4"></i> Nearby Cabs <span class="bilingual-sub font-normal text-xs ml-1">(ಹತ್ತಿರದ ಕ್ಯಾಬ್‌ಗಳು)</span></h3>
-                    <div id="cab-list" class="space-y-3 pb-20">
-                        <!-- Cabs injected here -->
-                    </div>
+                    <div id="cab-list" class="space-y-3 pb-20"></div>
                 </div>
 
                 <!-- ONBOARD -->
@@ -356,7 +412,7 @@
                     <div class="bg-blue-600 text-white rounded-3xl p-6 shadow-xl shadow-blue-200">
                         <div class="flex justify-between items-start mb-6">
                             <div>
-                                <p class="text-blue-200 text-xs font-bold mb-1 uppercase">ONBOARD / ಮಂಡಳಿಯಲ್ಲಿ</p>
+                                <p class="text-blue-200 text-xs font-bold mb-1 uppercase">ONBOARD</p>
                                 <h2 id="onboard-driver" class="text-2xl font-bold">Driver Name</h2>
                                 <p id="onboard-vehicle" class="opacity-90 text-sm font-mono">Vehicle</p>
                             </div>
@@ -372,11 +428,11 @@
 
                         <!-- WHATSAPP SHARE -->
                         <a id="btn-share-wa" href="#" target="_blank" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 mb-3 active:scale-95">
-                            <i data-lucide="share-2"></i> Share Ride Details (WhatsApp)
+                            <i data-lucide="share-2"></i> Share Ride Details
                         </a>
 
                         <button onclick="window.app.confirmAction('Drop/Leave Cab?', 'Confirm you have reached destination.', window.app.leaveTrip)" id="btn-leave" class="w-full bg-white text-blue-600 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95">
-                            <i data-lucide="map-pin"></i> Drop / Leave <span class="bilingual-sub text-[10px] text-blue-400 font-normal">ಇಳಿಯಿರಿ</span>
+                            <i data-lucide="map-pin"></i> Drop / Leave
                         </button>
                     </div>
                 </div>
@@ -425,7 +481,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, arrayUnion, where, getDocs, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, orderBy, arrayUnion, where, getDocs, limit, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURATION ---
         const firebaseConfig = {
@@ -437,6 +493,7 @@
             appId: "1:880698217100:web:02d727fbafd4fc6a5161a9"
         };
         const appId = 'cabsight';
+        const OFFICE_LOC = { lat: 15.288298301743996, lng: 75.14260599281373, name: "Office" };
 
         // Initialize Firebase
         const firebaseApp = initializeApp(firebaseConfig);
@@ -445,80 +502,38 @@
 
         // --- GLOBAL STATE ---
         const state = {
-            user: null, 
-            trips: [],
-            usersList: [], 
-            requests: [], 
-            gps: null,
-            photo: null,
-            activeTrip: null,
-            myTrip: null,
-            myRequest: null, 
-            loginRole: null,
-            pendingAction: null
+            user: null, trips: [], usersList: [], requests: [], gps: null, photo: null, activeTrip: null, myTrip: null, myRequest: null, loginRole: null, pendingAction: null, regRole: 'staff',
+            tempProfileLoc: { day: null, night: null }, tripTimerInterval: null
         };
 
         // --- DOM ELEMENTS ---
         const els = {
             views: ['loading-view', 'auth-view', 'login-form-view', 'onboarding-view', 'pending-view', 'driver-view', 'employee-view', 'admin-view'],
-            toast: document.getElementById('toast'),
-            toastMsg: document.getElementById('toast-msg'),
-            regName: document.getElementById('reg-name'),
-            regPhone: document.getElementById('reg-phone'),
-            regPin: document.getElementById('reg-pin'),
-            regVehicle: document.getElementById('reg-vehicle'),
-            regPlate: document.getElementById('reg-plate'),
-            regDept: document.getElementById('reg-dept'),
-            loginId: document.getElementById('login-id'),
-            loginPin: document.getElementById('login-pin'),
-            driverFields: document.getElementById('reg-driver-fields'),
-            empFields: document.getElementById('reg-employee-fields'),
-            btnRoleDriver: document.getElementById('btn-role-driver'),
-            btnRoleEmp: document.getElementById('btn-role-employee'),
-            cabList: document.getElementById('cab-list'),
-            adminTripList: document.getElementById('admin-trip-list'),
-            adminUserList: document.getElementById('admin-user-list'),
-            tripTimeline: document.getElementById('trip-timeline'),
-            reqList: document.getElementById('requests-list'),
-            // Request UI
-            reqIdle: document.getElementById('req-idle'),
-            reqPending: document.getElementById('req-pending'),
-            reqAccepted: document.getElementById('req-accepted'),
-            reqDriverName: document.getElementById('req-driver-name'),
-            reqDriverLoc: document.getElementById('req-driver-loc'),
-            reqCallBtn: document.getElementById('req-call-btn'),
-            reqStatusText: document.getElementById('req-status-text'),
-            reqWaitingUi: document.getElementById('req-waiting-ui'),
-            reqBoardingUi: document.getElementById('req-boarding-ui'),
-            // Onboard UI
-            onboardDriver: document.getElementById('onboard-driver'),
-            onboardVehicle: document.getElementById('onboard-vehicle'),
-            onboardLoc: document.getElementById('onboard-loc'),
-            btnShareWa: document.getElementById('btn-share-wa'),
-            // Modal
-            modal: document.getElementById('modal-overlay'),
-            modalTitle: document.getElementById('modal-title'),
-            modalDesc: document.getElementById('modal-desc')
+            toast: document.getElementById('toast'), toastMsg: document.getElementById('toast-msg'),
+            regName: document.getElementById('reg-name'), regPhone: document.getElementById('reg-phone'), regPin: document.getElementById('reg-pin'), regVehicle: document.getElementById('reg-vehicle'), regPlate: document.getElementById('reg-plate'), regDesignation: document.getElementById('reg-designation'),
+            loginId: document.getElementById('login-id'), loginPin: document.getElementById('login-pin'),
+            driverFields: document.getElementById('reg-driver-fields'), staffFields: document.getElementById('reg-staff-fields'), locSection: document.getElementById('reg-locations-section'),
+            btnRoleDriver: document.getElementById('btn-role-driver'), btnRoleStaff: document.getElementById('btn-role-staff'),
+            adminTripList: document.getElementById('admin-trip-list'), adminUserList: document.getElementById('admin-user-list'),
+            tripTimeline: document.getElementById('trip-timeline'), reqList: document.getElementById('requests-list'),
+            reqIdle: document.getElementById('req-idle'), reqPending: document.getElementById('req-pending'), reqAccepted: document.getElementById('req-accepted'), reqDriverName: document.getElementById('req-driver-name'), reqDriverLoc: document.getElementById('req-driver-loc'), reqCallBtn: document.getElementById('req-call-btn'), reqStatusText: document.getElementById('req-status-text'), reqWaitingUi: document.getElementById('req-waiting-ui'), reqBoardingUi: document.getElementById('req-boarding-ui'),
+            onboardDriver: document.getElementById('onboard-driver'), onboardVehicle: document.getElementById('onboard-vehicle'), onboardLoc: document.getElementById('onboard-loc'), btnShareWa: document.getElementById('btn-share-wa'),
+            modal: document.getElementById('modal-overlay'), modalTitle: document.getElementById('modal-title'), modalDesc: document.getElementById('modal-desc'), modalContent: document.getElementById('modal-content'), processing: document.getElementById('processing-overlay'),
+            locDayAddr: document.getElementById('loc-day-addr'), locNightAddr: document.getElementById('loc-night-addr'),
+            routeSuggestion: document.getElementById('route-suggestion'), routeSteps: document.getElementById('route-steps'), routeTotal: document.getElementById('route-total'), tripTimer: document.getElementById('trip-timer'),
+            btnAdminSwitch: document.getElementById('btn-admin-switch')
         };
 
-        // --- HELPER: Haversine Distance (km) ---
+        // --- HELPERS ---
+        const setLoading = (loading) => els.processing.classList.toggle('hide', !loading);
         const calcDist = (lat1, lon1, lat2, lon2) => {
             if(!lat1 || !lon1 || !lat2 || !lon2) return 0;
-            const R = 6371; 
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         };
-
         const getAddress = async (lat, lng) => {
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-                if (!res.ok) throw new Error('Geocode failed');
-                const data = await res.json();
-                const parts = data.display_name.split(',');
-                return `${parts[0]}, ${parts[1] || ''}`; 
-            } catch (e) { return `${lat}, ${lng}`; }
+            try { const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`); if (!res.ok) throw new Error(); const data = await res.json(); const parts = data.display_name.split(','); return `${parts[0]}, ${parts[1] || ''}`; } catch (e) { return `${lat}, ${lng}`; }
         };
 
         // --- APP LOGIC ---
@@ -526,62 +541,129 @@
             showView: (viewId) => { els.views.forEach(id => document.getElementById(id).classList.toggle('hide', id !== viewId)); lucide.createIcons(); },
             showToast: (msg) => { els.toastMsg.innerText = msg; els.toast.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => els.toast.classList.add('opacity-0', 'pointer-events-none'), 3000); },
             confirmAction: (title, desc, actionFn) => {
-                els.modalTitle.innerText = title; els.modalDesc.innerText = desc; state.pendingAction = actionFn; els.modal.classList.remove('hide');
-                document.getElementById('modal-confirm-btn').onclick = () => { if (state.pendingAction) state.pendingAction(); window.app.closeModal(); };
+                els.modalTitle.innerText = title; els.modalDesc.innerText = desc; els.modalContent.innerHTML = ''; state.pendingAction = actionFn; els.modal.classList.remove('hide');
+                document.getElementById('modal-confirm-btn').onclick = async () => { if (state.pendingAction) await state.pendingAction(); window.app.closeModal(); };
             },
-            closeModal: () => { els.modal.classList.add('hide'); state.pendingAction = null; },
+            closeModal: () => { els.modal.classList.add('hide'); state.pendingAction = null; els.modalContent.innerHTML = ''; },
             
             // AUTH
             showAuth: () => window.app.showView('auth-view'),
-            selectLoginRole: (role) => { state.loginRole = role; els.loginId.value = ''; els.loginPin.value = ''; window.app.showView('login-form-view'); },
+            selectLoginRole: (role) => { 
+                state.loginRole = role; 
+                els.loginId.value = ''; els.loginPin.value = ''; 
+                // Set logic specific title/icon if needed, but generic login page handles it
+                window.app.showView('login-form-view'); 
+            },
             submitLogin: async () => {
                 const id = els.loginId.value.trim(); const pin = els.loginPin.value.trim();
-                if(!id || !pin) return window.app.showToast("Enter ID & PIN");
-                let user = null;
-                // Demo Users
-                if(state.loginRole === 'driver' && id === 'driver' && pin === '1234') user = { id: 'd1', name: 'Ramesh Driver', role: 'driver', vehicle: 'Innova KA-01', phone:'9999999999', status: 'approved' };
-                else if(state.loginRole === 'employee' && id === 'employee' && pin === '1234') user = { id: 'e1', name: 'John Emp', role: 'employee', dept: 'Engineering', phone:'8888888888', status: 'approved' };
-                else if(state.loginRole === 'admin' && id === 'admin' && pin === '1234') user = { id: 'admin', name: 'Admin', role: 'admin', status: 'approved' };
-                
-                if (!user) {
-                    try {
-                        const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                        const q = query(usersRef, where("phone", "==", id), where("pin", "==", pin), where("role", "==", state.loginRole));
-                        const snapshot = await getDocs(q);
-                        if (!snapshot.empty) { const doc = snapshot.docs[0]; user = { id: doc.id, ...doc.data() }; }
-                    } catch (e) { console.error(e); }
-                }
-                if(user) {
-                    if (user.status === 'suspended') return window.app.showToast("Account Suspended.");
-                    if (user.status === 'pending') { state.user = user; return window.app.showView('pending-view'); }
-                    state.user = user; window.app.showToast(`Welcome, ${user.name}`); window.app.routeUser();
-                } else window.app.showToast("Invalid Credentials");
+                if(!id || !pin) return window.app.showToast("Enter Phone & PIN");
+                setLoading(true);
+                try {
+                    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                    const q = query(usersRef, where("phone", "==", id), where("pin", "==", pin));
+                    const snapshot = await getDocs(q);
+                    
+                    if (snapshot.empty) {
+                        window.app.showToast("Invalid Credentials");
+                    } else {
+                        const doc = snapshot.docs[0];
+                        const user = { id: doc.id, ...doc.data() };
+                        
+                        // Strict Role Validation based on Portal
+                        if (state.loginRole === 'driver' && user.role !== 'driver') throw new Error("Not a driver account");
+                        // Employee Login: Allowed for Employees, Admins, Superusers
+                        if (state.loginRole === 'employee' && user.role === 'driver') throw new Error("Drivers cannot use employee portal");
+                        // Admin Login: Allowed only for Admins/Superusers
+                        if (state.loginRole === 'admin' && user.role !== 'admin' && user.role !== 'superuser') throw new Error("Access Denied: Managers Only");
+
+                        if (user.status === 'suspended') throw new Error("Account Suspended");
+                        if (user.status === 'pending') { state.user = user; window.app.showView('pending-view'); return; }
+                        
+                        // Success
+                        state.user = user;
+                        // Save login intent to localStorage so refresh keeps them in the right portal
+                        localStorage.setItem('cabsight_uid', user.id);
+                        localStorage.setItem('cabsight_mode', state.loginRole); // 'driver', 'employee', 'admin'
+                        
+                        window.app.showToast(`Welcome, ${user.name}`);
+                        window.app.routeUser();
+                    }
+                } catch(e) { window.app.showToast(e.message || "Login Error"); }
+                finally { setLoading(false); }
             },
-            promptLogout: () => window.app.confirmAction('Log Out?', 'You will need to login again.', window.app.logout),
-            logout: () => { state.user = null; window.app.showView('auth-view'); },
+            promptLogout: () => window.app.confirmAction('Log Out?', 'End current session.', window.app.logout),
+            logout: () => { state.user = null; localStorage.removeItem('cabsight_uid'); localStorage.removeItem('cabsight_mode'); window.app.showView('auth-view'); },
+            
+            switchToAdmin: () => {
+                // Allows an admin logged in as employee to switch views without re-login
+                if (state.user && (state.user.role === 'admin' || state.user.role === 'superuser')) {
+                    localStorage.setItem('cabsight_mode', 'admin');
+                    state.loginRole = 'admin';
+                    window.app.routeUser();
+                }
+            },
 
             // REGISTRATION
-            showOnboarding: () => { state.regRole = 'employee'; window.app.updateRegUI(); window.app.showView('onboarding-view'); },
+            showOnboarding: () => { state.regRole = 'staff'; window.app.updateRegUI(); window.app.showView('onboarding-view'); },
             selectRegRole: (role) => { state.regRole = role; window.app.updateRegUI(); },
             updateRegUI: () => {
-                if(state.regRole === 'driver') { els.driverFields.classList.remove('hide'); els.empFields.classList.add('hide'); } 
-                else { els.driverFields.classList.add('hide'); els.empFields.classList.remove('hide'); }
+                if(state.regRole === 'driver') { els.driverFields.classList.remove('hide'); els.staffFields.classList.add('hide'); els.locSection.classList.add('hide'); els.btnRoleDriver.classList.add('border-cyan-500', 'text-cyan-500'); els.btnRoleStaff.classList.remove('border-cyan-500', 'text-cyan-500'); } 
+                else { els.driverFields.classList.add('hide'); els.staffFields.classList.remove('hide'); els.locSection.classList.remove('hide'); els.btnRoleStaff.classList.add('border-cyan-500', 'text-cyan-500'); els.btnRoleDriver.classList.remove('border-cyan-500', 'text-cyan-500'); }
+            },
+            captureProfileLoc: (type) => {
+                setLoading(true);
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const addr = await getAddress(pos.coords.latitude, pos.coords.longitude);
+                    state.tempProfileLoc[type] = { lat: pos.coords.latitude, lng: pos.coords.longitude, address: addr };
+                    document.getElementById(`loc-${type}-addr`).value = addr;
+                    setLoading(false);
+                }, () => { window.app.showToast("GPS Error"); setLoading(false); });
             },
             completeRegistration: async () => {
                 const name = els.regName.value; const phone = els.regPhone.value; const pin = els.regPin.value;
                 if(!name || !phone || !pin) return window.app.showToast("Fields Missing");
                 if(pin.length !== 4) return window.app.showToast("PIN must be 4 digits");
-                const userData = { name, phone, pin, role: state.regRole, vehicle: els.regVehicle.value || '', plate: els.regPlate.value || '', dept: els.regDept.value || '', status: 'pending', createdAt: new Date().toISOString() };
-                try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), userData); window.app.showToast("Registered! Waiting for Approval."); window.app.showAuth(); } catch(e) { window.app.showToast("Error Registering"); }
+                
+                let role = 'employee';
+                if(state.regRole === 'driver') role = 'driver';
+                else if(['Manager','Senior Manager','Director'].includes(els.regDesignation.value)) role = 'admin';
+
+                const userData = { name, phone, pin, role, designation: els.regDesignation.value || '', vehicle: els.regVehicle.value || '', plate: els.regPlate.value || '', status: 'pending', createdAt: new Date().toISOString(), savedLocations: state.tempProfileLoc };
+                
+                setLoading(true);
+                try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), userData); window.app.showToast("Registered! Waiting for Approval."); window.app.showAuth(); } 
+                catch(e) { window.app.showToast("Error Registering"); } finally { setLoading(false); }
             },
             routeUser: () => {
                 if(!state.user) return window.app.showView('auth-view');
                 if (state.user.status === 'pending') return window.app.showView('pending-view');
-                if(state.user.role === 'driver') {
-                    document.getElementById('d-name').innerText = state.user.name; document.getElementById('d-vehicle').innerText = state.user.vehicle || 'Vehicle'; window.app.showView('driver-view'); window.app.renderDriverState();
-                } else if(state.user.role === 'employee') {
-                    document.getElementById('e-name').innerText = state.user.name; window.app.showView('employee-view'); window.app.renderEmployeeState();
-                } else { window.app.showView('admin-view'); window.app.renderAdminState(); }
+                
+                // Route based on stored mode (login intent)
+                const mode = localStorage.getItem('cabsight_mode');
+                
+                if (mode === 'admin') {
+                    // Safety check
+                    if (state.user.role === 'admin' || state.user.role === 'superuser') {
+                        window.app.showView('admin-view'); window.app.renderAdminState();
+                    } else {
+                        // If roles changed/revoked, force logout or fallback
+                        window.app.logout();
+                    }
+                } else if (mode === 'driver') {
+                    if (state.user.role === 'driver') {
+                        document.getElementById('d-name').innerText = state.user.name; document.getElementById('d-vehicle').innerText = state.user.vehicle; window.app.showView('driver-view'); window.app.renderDriverState();
+                    } else window.app.logout();
+                } else {
+                    // Default to Employee View (mode 'employee')
+                    document.getElementById('e-name').innerText = state.user.name; 
+                    document.getElementById('emp-role-display').innerText = state.user.designation || 'Staff';
+                    
+                    // Show "Switch to Admin" if eligible
+                    if (state.user.role === 'admin' || state.user.role === 'superuser') els.btnAdminSwitch.classList.remove('hide');
+                    else els.btnAdminSwitch.classList.add('hide');
+                    
+                    window.app.showView('employee-view'); window.app.renderEmployeeState();
+                }
             },
 
             // DRIVER ACTIONS
@@ -593,56 +675,99 @@
                     const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
                     state.gps = { lat, lng, address };
                     document.getElementById('gps-status').innerHTML = `<i data-lucide="map-pin"></i> GPS OK`; document.getElementById('gps-status').classList.add('text-emerald-500', 'border-emerald-500');
-                    window.app.checkStartButton();
+                    if(document.getElementById('start-odo').value && state.photo) document.getElementById('btn-start-trip').disabled = false;
                 });
             },
-            checkStartButton: () => { if(document.getElementById('start-odo').value && state.photo && state.gps) document.getElementById('btn-start-trip').disabled = false; },
             startTrip: async () => {
                 const odo = document.getElementById('start-odo').value;
-                const tripId = `TRIP-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.random().toString(36).substr(2,5).toUpperCase()}`;
-                const tripData = { tripIdDisplay: tripId, driverId: state.user.id, driverName: state.user.name, vehicle: state.user.vehicle, startTime: new Date().toISOString(), startOdo: parseInt(odo), startLocation: state.gps.address, startLat: state.gps.lat, startLng: state.gps.lng, status: 'active', validationStatus: 'pending', passengers: [], stops: [{ type: 'start', time: new Date().toISOString(), lat: state.gps.lat, lng: state.gps.lng, desc: 'Started' }] };
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), tripData); window.app.showToast("Duty Started");
+                setLoading(true);
+                try {
+                    const tripId = `TRIP-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.random().toString(36).substr(2,5).toUpperCase()}`;
+                    const tripData = { tripIdDisplay: tripId, driverId: state.user.id, driverName: state.user.name, driverPhone: state.user.phone, vehicle: state.user.vehicle, startTime: new Date().toISOString(), startOdo: parseInt(odo), startLocation: state.gps.address, startLat: state.gps.lat, startLng: state.gps.lng, status: 'active', validationStatus: 'pending', passengers: [], stops: [{ type: 'start', time: new Date().toISOString(), lat: state.gps.lat, lng: state.gps.lng, desc: 'Started' }] };
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), tripData); window.app.showToast("Duty Started");
+                } finally { setLoading(false); }
             },
             endTrip: async () => {
                 const odo = document.getElementById('end-odo').value; if(!state.activeTrip || !odo) return window.app.showToast("Enter Odometer");
-                let calculatedDist = 0; let prev = { lat: state.activeTrip.startLat, lng: state.activeTrip.startLng };
-                state.activeTrip.stops.forEach(stop => { calculatedDist += calcDist(prev.lat, prev.lng, stop.lat, stop.lng); prev = { lat: stop.lat, lng: stop.lng }; });
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    calculatedDist += calcDist(prev.lat, prev.lng, pos.coords.latitude, pos.coords.longitude);
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id), { endTime: new Date().toISOString(), endOdo: parseInt(odo), totalKm: parseInt(odo) - state.activeTrip.startOdo, calculatedKm: calculatedDist.toFixed(1), status: 'completed', stops: arrayUnion({ type: 'end', time: new Date().toISOString(), lat: pos.coords.latitude, lng: pos.coords.longitude, desc: 'Ended' }) });
-                    state.photo = null; state.gps = null; document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = ''; window.app.showToast("Duty Ended. Stats Saved.");
-                });
+                setLoading(true);
+                try {
+                    let calculatedDist = 0; let prev = { lat: state.activeTrip.startLat, lng: state.activeTrip.startLng };
+                    state.activeTrip.stops.forEach(stop => { calculatedDist += calcDist(prev.lat, prev.lng, stop.lat, stop.lng); prev = { lat: stop.lat, lng: stop.lng }; });
+                    navigator.geolocation.getCurrentPosition(async (pos) => {
+                        calculatedDist += calcDist(prev.lat, prev.lng, pos.coords.latitude, pos.coords.longitude);
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id), { endTime: new Date().toISOString(), endOdo: parseInt(odo), totalKm: parseInt(odo) - state.activeTrip.startOdo, calculatedKm: calculatedDist.toFixed(1), status: 'completed', stops: arrayUnion({ type: 'end', time: new Date().toISOString(), lat: pos.coords.latitude, lng: pos.coords.longitude, desc: 'Ended' }) });
+                        state.photo = null; state.gps = null; document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = ''; window.app.showToast("Duty Ended. Stats Saved.");
+                        setLoading(false);
+                    });
+                } catch(e) { setLoading(false); }
             },
-            acceptRequest: async (reqId, reqLat, reqLng) => {
-                const tripId = state.activeTrip ? state.activeTrip.id : null;
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId), { status: 'accepted', driverId: state.user.id, driverName: state.user.name, driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route', driverPhone: state.user.phone, tripId: tripId });
-                window.app.showToast("Request Accepted. Added to list.");
+            acceptRequest: async (reqId) => {
+                setLoading(true);
+                try {
+                    const tripId = state.activeTrip ? state.activeTrip.id : null;
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId), { status: 'accepted', driverId: state.user.id, driverName: state.user.name, driverLoc: state.activeTrip ? state.activeTrip.startLocation : 'En Route', driverPhone: state.user.phone, tripId: tripId });
+                    window.app.showToast("Request Accepted.");
+                } finally { setLoading(false); }
             },
             markArrived: async (reqId) => {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId), { status: 'arrived', arrivedTime: new Date().toISOString() });
-                window.app.showToast("Marked Arrived. Notifying Employee.");
+                setLoading(true);
+                try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', reqId), { status: 'arrived', arrivedTime: new Date().toISOString() }); window.app.showToast("Marked Arrived."); } 
+                finally { setLoading(false); }
+            },
+            updateTripTimer: () => {
+                if(state.activeTrip && state.activeTrip.status === 'active') {
+                    const start = new Date(state.activeTrip.startTime);
+                    const now = new Date();
+                    const diff = Math.floor((now - start) / 1000);
+                    const h = Math.floor(diff / 3600).toString().padStart(2,'0');
+                    const m = Math.floor((diff % 3600) / 60).toString().padStart(2,'0');
+                    const s = (diff % 60).toString().padStart(2,'0');
+                    els.tripTimer.innerText = `${h}:${m}:${s}`;
+                }
             },
             renderDriverState: () => {
                 const active = state.trips.find(t => t.driverId === state.user.id && t.status === 'active');
                 state.activeTrip = active;
+                if(state.tripTimerInterval) clearInterval(state.tripTimerInterval);
                 
-                // Show accepted/pending pickups
                 const myReqs = state.requests.filter(r => (r.status === 'pending') || (r.status === 'accepted' && r.driverId === state.user.id) || (r.status === 'arrived' && r.driverId === state.user.id));
-                
-                els.reqList.innerHTML = myReqs.length ? myReqs.map(r => {
-                    if (r.status === 'pending') {
-                        // Pending card
-                        return `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center"><div><p class="font-bold text-sm text-white">${r.employeeName}</p><p class="text-xs text-slate-400 truncate max-w-[150px]">${r.pickupAddress}</p></div><button onclick="window.app.confirmAction('Accept?', 'Add to stops.', () => window.app.acceptRequest('${r.id}'))" class="bg-cyan-600 text-black text-xs font-bold px-3 py-2 rounded-lg">Accept</button></div>`;
-                    } else if (r.status === 'accepted') {
-                        // Accepted card (With distance)
-                        const dist = state.gps ? calcDist(state.gps.lat, state.gps.lng, r.pickupLat, r.pickupLng).toFixed(1) : '?';
-                        return `<div class="bg-blue-900/30 p-4 rounded-xl border border-blue-500/50"><div class="flex justify-between items-start mb-2"><div><p class="font-bold text-sm text-blue-300">Next Pickup: ${r.employeeName}</p><p class="text-xs text-slate-400">${dist} km away</p></div><button onclick="window.app.confirmAction('Arrived?', 'Notify employee.', () => window.app.markArrived('${r.id}'))" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Mark Arrived</button></div><p class="text-[10px] text-slate-500 truncate"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${r.pickupAddress}</p></div>`;
-                    } else if (r.status === 'arrived') {
-                        return `<div class="bg-green-900/30 p-4 rounded-xl border border-green-500/50 text-center"><p class="font-bold text-green-400">Waiting for ${r.employeeName}...</p><p class="text-xs text-slate-500">You marked arrived.</p></div>`;
+                const acceptedReqs = myReqs.filter(r => r.status === 'accepted' || r.status === 'arrived');
+
+                // Route Logic
+                if(active && acceptedReqs.length > 0) {
+                    els.routeSuggestion.classList.remove('hide');
+                    let current = { lat: parseFloat(active.startLat), lng: parseFloat(active.startLng) };
+                    let pending = [...acceptedReqs].map(r => ({...r, lat: parseFloat(r.pickupLat), lng: parseFloat(r.pickupLng)}));
+                    let route = [];
+                    let totalDist = 0;
+
+                    while(pending.length > 0) {
+                        let closest = null, minDist = Infinity, idx = -1;
+                        pending.forEach((p, i) => {
+                            const d = calcDist(current.lat, current.lng, p.lat, p.lng);
+                            if(d < minDist) { minDist = d; closest = p; idx = i; }
+                        });
+                        totalDist += minDist;
+                        route.push(closest);
+                        current = { lat: closest.lat, lng: closest.lng };
+                        pending.splice(idx, 1);
                     }
+                    totalDist += calcDist(current.lat, current.lng, OFFICE_LOC.lat, OFFICE_LOC.lng);
+                    
+                    els.routeSteps.innerHTML = route.map((r, i) => `<div class="flex gap-2"><span class="text-slate-500">${i+1}.</span> <span>${r.employeeName}</span></div>`).join('') + `<div class="flex gap-2 text-emerald-400"><span class="text-slate-500">End.</span> <span>Office HQ</span></div>`;
+                    els.routeTotal.innerText = `Est. Total: ${totalDist.toFixed(1)} km`;
+                } else {
+                    els.routeSuggestion.classList.add('hide');
+                }
+
+                els.reqList.innerHTML = myReqs.length ? myReqs.map(r => {
+                    if (r.status === 'pending') return `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center"><div><p class="font-bold text-sm text-white">${r.employeeName}</p><p class="text-xs text-slate-400 truncate max-w-[150px]">${r.pickupAddress}</p></div><button onclick="window.app.confirmAction('Accept?', 'Add to stops.', () => window.app.acceptRequest('${r.id}'))" class="bg-cyan-600 text-black text-xs font-bold px-3 py-2 rounded-lg">Accept</button></div>`;
+                    if (r.status === 'accepted') return `<div class="bg-blue-900/30 p-4 rounded-xl border border-blue-500/50"><div class="flex justify-between items-start mb-2"><div><p class="font-bold text-sm text-blue-300">Next Pickup: ${r.employeeName}</p><p class="text-xs text-slate-400">${state.gps ? calcDist(state.gps.lat,state.gps.lng,r.pickupLat,r.pickupLng).toFixed(1)+' km' : ''}</p></div><button onclick="window.app.confirmAction('Arrived?', 'Notify employee.', () => window.app.markArrived('${r.id}'))" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-lg">Mark Arrived</button></div><p class="text-[10px] text-slate-500 truncate"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${r.pickupAddress}</p></div>`;
+                    if (r.status === 'arrived') return `<div class="bg-green-900/30 p-4 rounded-xl border border-green-500/50 text-center"><p class="font-bold text-green-400">Waiting for ${r.employeeName}...</p><p class="text-xs text-slate-500">Marked Arrived</p></div>`;
                 }).join('') : `<p class="text-xs text-slate-500 text-center italic">No pickups</p>`;
 
                 if(active) {
+                    state.tripTimerInterval = setInterval(window.app.updateTripTimer, 1000);
                     document.getElementById('driver-idle').classList.add('hide'); document.getElementById('driver-active').classList.remove('hide');
                     document.getElementById('trip-start-loc').innerText = active.startLocation;
                     els.tripTimeline.innerHTML = active.stops.map(stop => `<div class="flex gap-3 pb-4 border-l ml-1 pl-4 border-slate-700 relative"><div class="absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-cyan-500"></div><div><p class="text-xs font-bold text-slate-200">${stop.desc}</p><p class="text-[10px] text-slate-500">${new Date(stop.time).toLocaleTimeString()}</p></div></div>`).join('');
@@ -653,52 +778,67 @@
             },
 
             // EMPLOYEE ACTIONS
-            requestPickup: () => {
-                const btn = document.getElementById('btn-request-pickup'); btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i>...`;
+            initiatePickupRequest: () => {
+                els.modalContent.innerHTML = '<div class="text-center py-4"><i data-lucide="loader-2" class="animate-spin mx-auto mb-2"></i><p class="text-xs text-slate-400">Acquiring accurate GPS...</p></div>';
+                lucide.createIcons();
+                els.modal.classList.remove('hide');
+                els.modalTitle.innerText = "Requesting...";
+                els.modalDesc.innerText = "Please wait.";
+                document.getElementById('modal-confirm-btn').classList.add('hide');
+
+                let gpsFound = false;
+                setTimeout(() => {
+                    if(!gpsFound) {
+                        const locs = state.user.savedLocations || {};
+                        let html = '<p class="text-xs text-orange-400 mb-2">GPS Slow. Select Saved Location:</p><div class="space-y-2">';
+                        if(locs.day) html += `<button onclick="window.app.sendReqWithLoc('${locs.day.lat}', '${locs.day.lng}', '${locs.day.address}')" class="w-full bg-slate-800 p-3 rounded-lg text-left text-xs border border-slate-700 hover:border-cyan-500"><span class="font-bold block">☀️ Day Pickup</span> ${locs.day.address}</button>`;
+                        if(locs.night) html += `<button onclick="window.app.sendReqWithLoc('${locs.night.lat}', '${locs.night.lng}', '${locs.night.address}')" class="w-full bg-slate-800 p-3 rounded-lg text-left text-xs border border-slate-700 hover:border-purple-500"><span class="font-bold block">🌙 Night Pickup</span> ${locs.night.address}</button>`;
+                        html += `<button onclick="window.app.sendReqWithLoc('${OFFICE_LOC.lat}', '${OFFICE_LOC.lng}', '${OFFICE_LOC.name}')" class="w-full bg-slate-800 p-3 rounded-lg text-left text-xs border border-slate-700 hover:border-emerald-500"><span class="font-bold block">🏢 Office</span> Hubli</button></div>`;
+                        els.modalContent.innerHTML = html; els.modalTitle.innerText = "Select Location"; els.modalDesc.innerText = "Choose a saved spot.";
+                    }
+                }, 5000);
+
                 navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), {
-                        employeeId: state.user.id, employeeName: state.user.name, employeePhone: state.user.phone || '', pickupLat: lat, pickupLng: lng, pickupAddress: address, status: 'pending', timestamp: new Date().toISOString()
-                    });
-                    btn.innerHTML = `<i data-lucide="map-pin"></i> Request Pickup`;
+                    gpsFound = true; const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
+                    window.app.sendReqWithLoc(lat, lng, address);
                 });
             },
-            refreshDriverLoc: () => { window.app.showToast("Refreshed."); window.app.renderEmployeeState(); },
+            sendReqWithLoc: async (lat, lng, address) => {
+                setLoading(true); window.app.closeModal();
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'requests'), { employeeId: state.user.id, employeeName: state.user.name, employeePhone: state.user.phone, pickupLat: lat, pickupLng: lng, pickupAddress: address, status: 'pending', timestamp: new Date().toISOString() });
+                } finally { setLoading(false); }
+            },
+            refreshDriverLoc: () => { setLoading(true); setTimeout(() => { window.app.showToast("Refreshed."); window.app.renderEmployeeState(); setLoading(false); }, 800); },
             boardCabFromRequest: () => {
                 const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
-                if (myReq) window.app.joinTrip(myReq.tripId || null); // Fallback to null will trigger error in joinTrip
+                if (myReq && myReq.tripId) window.app.joinTrip(myReq.tripId);
                 else window.app.showToast("No active trip found.");
             },
             joinTrip: async (tripId) => {
-                if(!tripId) return window.app.showToast("Error: Trip ID missing.");
-                window.app.showToast("Boarding...");
-                
-                // Get Request Data to calculate wait time
-                const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
-                const arrivalTime = myReq && myReq.arrivedTime ? new Date(myReq.arrivedTime) : new Date();
-                const boardTime = new Date();
-                const waitMins = Math.round((boardTime - arrivalTime) / 60000); // mins
-
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), {
-                        passengers: arrayUnion({ id: state.user.id, name: state.user.name, boardTime: boardTime.toISOString(), waitTime: waitMins }),
-                        stops: arrayUnion({ type: 'pickup', time: boardTime.toISOString(), lat, lng, desc: `Pickup: ${state.user.name} (Wait: ${waitMins}m)` })
+                setLoading(true);
+                try {
+                    const myReq = state.requests.find(r => r.employeeId === state.user.id && (r.status === 'accepted' || r.status === 'arrived'));
+                    const waitMins = myReq && myReq.arrivedTime ? Math.round((new Date() - new Date(myReq.arrivedTime))/60000) : 0;
+                    navigator.geolocation.getCurrentPosition(async (pos) => {
+                        const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), { passengers: arrayUnion({ id: state.user.id, name: state.user.name, waitTime: waitMins }), stops: arrayUnion({ type: 'pickup', time: new Date().toISOString(), lat, lng, desc: `Pickup: ${state.user.name} (Wait: ${waitMins}m)` }) });
+                        if(myReq) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', myReq.id), { status: 'completed' });
+                        setLoading(false);
                     });
-                    if (myReq) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'requests', myReq.id), { status: 'completed' });
-                });
+                } catch(e) { setLoading(false); }
             },
             leaveTrip: async () => {
                 if(!state.myTrip) return;
-                window.app.showToast("Leaving...");
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                     const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
-                     const newPassengers = state.myTrip.passengers.filter(p => p.id !== state.user.id);
-                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.myTrip.id), {
-                        passengers: newPassengers,
-                        stops: arrayUnion({ type: 'drop', time: new Date().toISOString(), lat, lng, desc: `Drop: ${state.user.name} at ${address}` })
-                     });
-                });
+                setLoading(true);
+                try {
+                    navigator.geolocation.getCurrentPosition(async (pos) => {
+                         const lat = pos.coords.latitude.toFixed(6); const lng = pos.coords.longitude.toFixed(6); const address = await getAddress(lat, lng);
+                         const newPassengers = state.myTrip.passengers.filter(p => p.id !== state.user.id);
+                         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.myTrip.id), { passengers: newPassengers, stops: arrayUnion({ type: 'drop', time: new Date().toISOString(), lat, lng, desc: `Drop: ${state.user.name} at ${address}` }) });
+                         setLoading(false);
+                    });
+                } catch(e) { setLoading(false); }
             },
             renderEmployeeState: () => {
                 const myTrip = state.trips.find(t => t.status === 'active' && t.passengers?.some(p => p.id === state.user.id));
@@ -707,33 +847,28 @@
                 
                 if(myTrip) {
                     document.getElementById('employee-idle').classList.add('hide'); document.getElementById('employee-request-ui').classList.add('hide'); document.getElementById('employee-onboard').classList.remove('hide');
-                    els.onboardDriver.innerText = myTrip.driverName; els.onboardVehicle.innerText = myTrip.vehicle; els.onboardLoc.innerText = `Started at ${myTrip.startLocation}`;
-                    
-                    // WHATSAPP LINK GENERATION
-                    const myPassengerData = myTrip.passengers.find(p => p.id === state.user.id);
-                    const waitTime = myPassengerData ? myPassengerData.waitTime : 0;
-                    const waText = `Hi, I am ${state.user.name}. I have boarded Cab ${myTrip.vehicle} (Driver: ${myTrip.driverName}) from ${myTrip.startLocation} at ${new Date().toLocaleTimeString()}. Wait Time: ${waitTime} mins.`;
-                    els.btnShareWa.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
-
+                    els.onboardDriver.innerText = myTrip.driverName; els.onboardVehicle.innerText = myTrip.vehicle; els.onboardLoc.innerText = `Started: ${myTrip.startLocation}`;
+                    // WhatsApp
+                    const waEn = `Hi, I am ${state.user.name}. I have boarded Cab ${myTrip.vehicle} (Driver: ${myTrip.driverName}, Ph: ${myTrip.driverPhone}) from ${myTrip.startLocation} at ${new Date().toLocaleTimeString()}.`;
+                    const waKn = `ನಮಸ್ಕಾರ, ನಾನು ${state.user.name}. ನಾನು ${myTrip.startLocation} ಇಂದ ${new Date().toLocaleTimeString()} ಸಮಯದಲ್ಲಿ ಕ್ಯಾಬ್ ${myTrip.vehicle} (ಚಾಲಕ: ${myTrip.driverName}, ಫೋನ್: ${myTrip.driverPhone}) ಹತ್ತಿದ್ದೇನೆ.`;
+                    els.btnShareWa.href = `https://wa.me/?text=${encodeURIComponent(waEn + '\n\n' + waKn)}`;
                 } else if (myReq) {
                     document.getElementById('employee-idle').classList.add('hide'); document.getElementById('employee-onboard').classList.add('hide'); document.getElementById('employee-request-ui').classList.remove('hide');
-                    if(myReq.status === 'pending') {
-                        els.reqPending.classList.remove('hide'); els.reqAccepted.classList.add('hide'); els.reqIdle.classList.add('hide');
-                    } else if (myReq.status === 'accepted' || myReq.status === 'arrived') {
+                    if(myReq.status === 'pending') { els.reqPending.classList.remove('hide'); els.reqAccepted.classList.add('hide'); els.reqIdle.classList.add('hide'); }
+                    else {
                         els.reqPending.classList.add('hide'); els.reqAccepted.classList.remove('hide'); els.reqIdle.classList.add('hide');
-                        els.reqDriverName.innerText = myReq.driverName;
-                        els.reqCallBtn.href = `tel:${myReq.driverPhone}`;
-                        // Logic for Arrived State
-                        if(myReq.status === 'arrived') {
-                            els.reqStatusText.innerText = "Driver is Here!";
-                            els.reqStatusText.className = "font-bold text-green-600 text-lg animate-pulse";
-                            els.reqWaitingUi.classList.add('hide');
-                            els.reqBoardingUi.classList.remove('hide');
-                        } else {
-                            els.reqStatusText.innerText = "Cab Arriving";
-                            els.reqStatusText.className = "font-bold text-green-800 text-sm";
-                            els.reqWaitingUi.classList.remove('hide');
-                            els.reqBoardingUi.classList.add('hide');
+                        els.reqDriverName.innerText = myReq.driverName; els.reqCallBtn.href = `tel:${myReq.driverPhone}`;
+                        if(myReq.status === 'arrived') { 
+                            els.reqStatusText.innerText = "Driver is Here!"; 
+                            els.reqStatusText.className = "font-bold text-green-600 text-lg animate-pulse"; 
+                            els.reqWaitingUi.classList.add('hide'); 
+                            els.reqBoardingUi.classList.remove('hide'); 
+                        }
+                        else { 
+                            els.reqStatusText.innerText = "Cab Arriving"; 
+                            els.reqStatusText.className = "font-bold text-green-800 text-sm"; 
+                            els.reqWaitingUi.classList.remove('hide'); 
+                            els.reqBoardingUi.classList.add('hide'); 
                         }
                         const driverTrip = state.trips.find(t => t.driverId === myReq.driverId && t.status === 'active');
                         els.reqDriverLoc.innerText = driverTrip ? driverTrip.startLocation : myReq.driverLoc;
@@ -753,13 +888,22 @@
                 document.getElementById('tab-users').className = tab==='users' ? 'flex-1 py-3 border-b-2 border-emerald-500 text-emerald-600' : 'flex-1 py-3 border-b-2 border-transparent hover:text-slate-800';
                 document.getElementById('admin-tab-trips').classList.toggle('hide', tab!=='trips'); document.getElementById('admin-tab-users').classList.toggle('hide', tab!=='users');
             },
-            updateUserStatus: async (uid, newStatus) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { status: newStatus }); window.app.showToast(`User ${newStatus}`); },
-            validateTrip: async (tripId, status) => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), { validationStatus: status }); window.app.showToast(`Trip ${status}`); },
+            updateUserStatus: async (uid, newStatus) => { setLoading(true); try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { status: newStatus }); window.app.showToast(`User ${newStatus}`); } finally { setLoading(false); } },
+            validateTrip: async (tripId, status) => { setLoading(true); try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', tripId), { validationStatus: status }); window.app.showToast(`Trip ${status}`); } finally { setLoading(false); } },
             renderAdminState: () => {
-                els.adminUserList.innerHTML = state.usersList.map(u => `<div class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center"><div><p class="font-bold text-sm ${u.status==='pending'?'text-orange-600':u.status==='suspended'?'text-red-500':'text-slate-800'}">${u.name} <span class="text-[10px] uppercase border px-1 rounded ml-1">${u.role}</span></p><p class="text-xs text-slate-500">${u.phone} • ${u.status}</p></div><div class="flex gap-1">${u.status==='pending'||u.status==='suspended'?`<button onclick="window.app.updateUserStatus('${u.id}', 'approved')" class="p-2 bg-emerald-100 text-emerald-700 rounded"><i data-lucide="check" class="w-3 h-3"></i></button>`:''}${u.status==='approved'?`<button onclick="window.app.confirmAction('Suspend User?', 'They cannot login.', () => window.app.updateUserStatus('${u.id}', 'suspended'))" class="p-2 bg-red-100 text-red-700 rounded"><i data-lucide="ban" class="w-3 h-3"></i></button>`:''}</div></div>`).join('');
+                const isSuper = state.user.role === 'superuser';
+                els.adminUserList.innerHTML = state.usersList.map(u => `
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <div><p class="font-bold text-sm ${u.status==='pending'?'text-orange-600':u.status==='suspended'?'text-red-500':'text-slate-800'}">${u.name} <span class="text-[10px] uppercase border px-1 rounded ml-1">${u.designation || u.role}</span></p><p class="text-xs text-slate-500">${u.phone} • ${u.status}</p></div>
+                        <div class="flex gap-1">
+                            ${(u.status==='pending'||u.status==='suspended') ? `<button onclick="window.app.updateUserStatus('${u.id}', 'approved')" class="p-2 bg-emerald-100 text-emerald-700 rounded"><i data-lucide="check" class="w-3 h-3"></i></button>` : ''}
+                            ${(u.status==='approved' && isSuper) ? `<button onclick="window.app.confirmAction('Suspend User?', 'They cannot login.', () => window.app.updateUserStatus('${u.id}', 'suspended'))" class="p-2 bg-red-100 text-red-700 rounded"><i data-lucide="ban" class="w-3 h-3"></i></button>` : ''}
+                        </div>
+                    </div>`).join('');
                 els.adminTripList.innerHTML = state.trips.map(t => {
                     const variance = t.totalKm && t.calculatedKm ? (t.totalKm - t.calculatedKm).toFixed(1) : 0;
-                    return `<div class="bg-white p-4 rounded-xl border ${t.validationStatus === 'valid' ? 'border-emerald-500 bg-emerald-50' : t.validationStatus === 'flagged' ? 'border-red-500 bg-red-50' : 'border-slate-200'}"><div class="flex justify-between items-start mb-2"><div><p class="text-xs font-mono text-slate-400">${t.tripIdDisplay || t.id.substr(0,8)}</p><p class="font-bold text-sm">${t.driverName}</p></div><div class="text-right"><p class="text-xs font-bold ${t.status==='active'?'text-green-600':'text-slate-500'} uppercase">${t.status}</p><p class="text-[10px] text-slate-400">${new Date(t.startTime).toLocaleDateString()}</p></div></div><div class="grid grid-cols-3 gap-2 text-xs mb-3 bg-slate-50 p-2 rounded"><div><span class="block text-slate-400">Claimed</span><span class="font-bold">${t.totalKm || 0} km</span></div><div><span class="block text-slate-400">Calc</span><span class="font-bold">${t.calculatedKm || 0} km</span></div><div><span class="block text-slate-400">Var</span><span class="font-bold ${variance>5?'text-red-600':'text-green-600'}">${variance} km</span></div></div><div class="flex gap-2 justify-end">${t.validationStatus!=='valid'?`<button onclick="window.app.validateTrip('${t.id}', 'valid')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Validate</button>`:''}${t.validationStatus!=='flagged'?`<button onclick="window.app.confirmAction('Flag Trip?', 'Mark as suspicious.', () => window.app.validateTrip('${t.id}', 'flagged'))" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded">Flag</button>`:''}</div></div>`;
+                    return `<div class="bg-white p-4 rounded-xl border ${t.validationStatus === 'valid' ? 'border-emerald-500 bg-emerald-50' : t.validationStatus === 'flagged' ? 'border-red-500 bg-red-50' : 'border-slate-200'}"><div class="flex justify-between items-start mb-2"><div><p class="text-xs font-mono text-slate-400">${t.tripIdDisplay || t.id.substr(0,8)}</p><p class="font-bold text-sm">${t.driverName}</p></div><div class="text-right"><p class="text-xs font-bold ${t.status==='active'?'text-green-600':'text-slate-500'} uppercase">${t.status}</p><p class="text-[10px] text-slate-400">${new Date(t.startTime).toLocaleDateString()}</p></div></div><div class="grid grid-cols-3 gap-2 text-xs mb-3 bg-slate-50 p-2 rounded"><div><span class="block text-slate-400">Claimed</span><span class="font-bold">${t.totalKm || 0} km</span></div><div><span class="block text-slate-400">Calc</span><span class="font-bold">${t.calculatedKm || 0} km</span></div><div><span class="block text-slate-400">Var</span><span class="font-bold ${variance>5?'text-red-600':'text-green-600'}">${variance} km</span></div></div>
+                    ${isSuper ? `<div class="flex gap-2 justify-end">${t.validationStatus!=='valid'?`<button onclick="window.app.validateTrip('${t.id}', 'valid')" class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Validate</button>`:''}${t.validationStatus!=='flagged'?`<button onclick="window.app.confirmAction('Flag Trip?', 'Mark as suspicious.', () => window.app.validateTrip('${t.id}', 'flagged'))" class="text-xs bg-red-100 text-red-600 px-3 py-1 rounded">Flag</button>`:''}</div>` : ''}</div>`;
                 }).join('');
                 lucide.createIcons();
             },
@@ -773,8 +917,28 @@
         // INIT
         setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString(); }, 1000);
         const init = async () => {
-            setTimeout(() => { if (!document.getElementById('loading-view').classList.contains('hide')) document.getElementById('loading-error').classList.remove('hide'); }, 5000);
+            setTimeout(() => { if (!document.getElementById('loading-view').classList.contains('hide')) document.getElementById('loading-error').classList.remove('hide'); }, 8000);
             try { await signInAnonymously(auth); } catch (e) { console.error("Auth Failed:", e); }
+            
+            // Check Persistent Session
+            const storedUid = localStorage.getItem('cabsight_uid');
+            if(storedUid) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', storedUid);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()) {
+                        const user = { id: docSnap.id, ...docSnap.data() };
+                        if(user.status !== 'suspended') {
+                            state.user = user;
+                            state.loginRole = localStorage.getItem('cabsight_mode');
+                            window.app.showToast(`Resuming session as ${user.name}`);
+                            window.app.routeUser();
+                        }
+                    }
+                } catch(e) { console.error("Restore Session Error", e); }
+            }
+
+            // Realtime Listeners
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'trips'), orderBy('startTime', 'desc'), limit(50)), (snap) => {
                 state.trips = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user) window.app.routeUser(); document.getElementById('loading-view').classList.add('hide'); if(!state.user) window.app.showAuth();
             });
@@ -782,7 +946,7 @@
                 state.requests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user) window.app.routeUser();
             });
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users'), orderBy('createdAt', 'desc'), limit(100)), (snap) => {
-                state.usersList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user && state.user.role === 'admin') window.app.renderAdminState();
+                state.usersList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); if(state.user && (state.user.role === 'admin' || state.user.role === 'superuser')) window.app.renderAdminState();
             });
             if("geolocation" in navigator) navigator.geolocation.watchPosition(async (pos) => {
                 const addr = await getAddress(pos.coords.latitude, pos.coords.longitude); document.getElementById('live-location').innerText = addr.split(',')[0];

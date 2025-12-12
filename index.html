@@ -68,6 +68,70 @@
             <p class="text-slate-500 text-xs mt-1">Synchronizing Database</p>
         </div>
 
+        <!-- TRIP SUMMARY RECEIPT (New) -->
+        <div id="trip-summary-overlay" class="fixed inset-0 z-[70] hide bg-slate-950 flex flex-col p-6 overflow-y-auto">
+            <div class="flex-1 bg-white text-slate-900 rounded-3xl p-6 shadow-2xl relative flex flex-col">
+                <!-- Decorative Holes -->
+                <div class="absolute -left-3 top-1/4 w-6 h-6 bg-slate-950 rounded-full"></div>
+                <div class="absolute -right-3 top-1/4 w-6 h-6 bg-slate-950 rounded-full"></div>
+                
+                <!-- Receipt Header -->
+                <div class="text-center border-b-2 border-slate-100 pb-4 mb-4">
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">TRIP RECEIPT</h2>
+                    <p class="text-xs text-slate-400 font-mono mt-1" id="sum-id">ID: #---</p>
+                    <p class="text-xs text-slate-400 font-mono" id="sum-date">---</p>
+                </div>
+
+                <div class="space-y-5 flex-1">
+                    <!-- Driver Info -->
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Driver</p>
+                            <p class="font-bold text-lg leading-none" id="sum-driver">---</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold">Vehicle</p>
+                            <p class="font-bold text-lg leading-none" id="sum-vehicle">---</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats Box -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="flex justify-between mb-2 text-sm">
+                            <span class="text-slate-500">Start Odo</span>
+                            <span class="font-mono font-bold" id="sum-start-odo">---</span>
+                        </div>
+                        <div class="flex justify-between mb-3 text-sm">
+                            <span class="text-slate-500">End Odo</span>
+                            <span class="font-mono font-bold" id="sum-end-odo">---</span>
+                        </div>
+                        <div class="border-t-2 border-dashed border-slate-200 my-2"></div>
+                        <div class="flex justify-between text-xl items-end">
+                            <span class="font-bold text-slate-700">Total KM</span>
+                            <span class="font-black text-slate-900" id="sum-total-km">0.0</span>
+                        </div>
+                        <p class="text-[10px] text-right text-emerald-600 mt-1 font-medium" id="sum-calc-km">System Est: 0.0 km</p>
+                    </div>
+
+                    <!-- Route Log -->
+                    <div>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-2">Trip Log</p>
+                        <div class="border-l-2 border-slate-200 ml-1 pl-4 space-y-3" id="sum-timeline">
+                            <!-- Injected Items -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="mt-6 pt-4 border-t-2 border-slate-100 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">CabSight Verified Record</p>
+                </div>
+            </div>
+            <button onclick="window.app.closeSummary()" class="mt-4 w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform">
+                <i data-lucide="check-circle" class="inline w-5 h-5 mr-2"></i> Done / Close
+            </button>
+        </div>
+
         <!-- UNIVERSAL MODAL (Confirm / Input) -->
         <div id="modal-overlay" class="fixed inset-0 z-[60] hide flex items-center justify-center p-6">
             <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl transform scale-100 transition-transform">
@@ -100,41 +164,43 @@
         </div>
 
         <!-- AUTH ROLE SELECTION VIEW -->
-        <div id="auth-view" class="view-section hide flex-1 flex flex-col p-6 relative">
-            <div class="flex-1 flex flex-col justify-center space-y-4">
-                <div class="text-center mb-6">
-                    <h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1>
-                    <p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p>
-                </div>
-
-                <!-- Driver Card -->
-                <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95 text-left group">
-                    <div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400 group-hover:scale-110 transition-transform"><i data-lucide="car"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg">Driver Login</h3>
-                        <span class="bilingual-sub">ಚಾಲಕರ ಲಾಗಿನ್</span>
-                    </div>
-                </button>
-
-                <!-- Employee Card -->
-                <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95 text-left group">
-                    <div class="bg-purple-900/30 p-3 rounded-full text-purple-400 group-hover:scale-110 transition-transform"><i data-lucide="users"></i></div>
-                    <div>
-                        <h3 class="font-bold text-lg">Staff Login</h3>
-                        <span class="bilingual-sub">ಸಿಬ್ಬಂದಿ ಲಾಗಿನ್ (Includes Managers)</span>
-                    </div>
-                </button>
-
-                <div class="w-full h-px bg-slate-800 my-4"></div>
-
-                <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2">
-                    <i data-lucide="user-plus"></i> Register New User / ಹೊಸ ಬಳಕೆದಾರ
-                </button>
+        <div id="auth-view" class="view-section hide flex-1 flex flex-col items-center justify-center p-6 space-y-4">
+            <div class="text-center mb-6">
+                <h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1>
+                <p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p>
             </div>
 
-            <!-- Small Admin Button in Corner -->
-            <button onclick="window.app.selectLoginRole('admin')" class="absolute top-6 right-6 p-2 text-slate-600 hover:text-emerald-500 transition-colors" title="Admin Login">
-                <i data-lucide="shield-check" class="w-6 h-6"></i>
+            <!-- Driver Card -->
+            <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95 text-left group">
+                <div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400 group-hover:scale-110 transition-transform"><i data-lucide="car"></i></div>
+                <div>
+                    <h3 class="font-bold text-lg">Driver Login</h3>
+                    <span class="bilingual-sub">ಚಾಲಕರ ಲಾಗಿನ್</span>
+                </div>
+            </button>
+
+            <!-- Employee Card (Admins use this to request rides) -->
+            <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95 text-left group">
+                <div class="bg-purple-900/30 p-3 rounded-full text-purple-400 group-hover:scale-110 transition-transform"><i data-lucide="users"></i></div>
+                <div>
+                    <h3 class="font-bold text-lg">Staff Login</h3>
+                    <span class="bilingual-sub">ಸಿಬ್ಬಂದಿ ಲಾಗಿನ್ (Includes Managers)</span>
+                </div>
+            </button>
+
+            <!-- Admin Card (Dedicated) -->
+            <button onclick="window.app.selectLoginRole('admin')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500 flex items-center gap-4 transition-all active:scale-95">
+                <div class="bg-emerald-900/30 p-3 rounded-full text-emerald-400"><i data-lucide="shield"></i></div>
+                <div class="text-left">
+                    <h3 class="font-bold text-lg">Admin Panel</h3>
+                    <span class="bilingual-sub">ನಿರ್ವಾಹಕರು (ವ್ಯವಸ್ಥಾಪಕರು)</span>
+                </div>
+            </button>
+
+            <div class="w-full h-px bg-slate-800 my-4"></div>
+
+            <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2">
+                <i data-lucide="user-plus"></i> Register New User / ಹೊಸ ಬಳಕೆದಾರ
             </button>
         </div>
 
@@ -508,7 +574,7 @@
 
         // --- DOM ELEMENTS ---
         const els = {
-            views: ['loading-view', 'auth-view', 'login-form-view', 'onboarding-view', 'pending-view', 'driver-view', 'employee-view', 'admin-view'],
+            views: ['loading-view', 'auth-view', 'login-form-view', 'onboarding-view', 'pending-view', 'driver-view', 'employee-view', 'admin-view', 'trip-summary-overlay'],
             toast: document.getElementById('toast'), toastMsg: document.getElementById('toast-msg'),
             regName: document.getElementById('reg-name'), regPhone: document.getElementById('reg-phone'), regPin: document.getElementById('reg-pin'), regVehicle: document.getElementById('reg-vehicle'), regPlate: document.getElementById('reg-plate'), regDesignation: document.getElementById('reg-designation'),
             loginId: document.getElementById('login-id'), loginPin: document.getElementById('login-pin'),
@@ -521,7 +587,10 @@
             modal: document.getElementById('modal-overlay'), modalTitle: document.getElementById('modal-title'), modalDesc: document.getElementById('modal-desc'), modalContent: document.getElementById('modal-content'), modalInputContainer: document.getElementById('modal-input-container'), modalInput: document.getElementById('modal-input'), modalInputTip: document.getElementById('modal-input-tip'), processing: document.getElementById('processing-overlay'),
             locDayAddr: document.getElementById('loc-day-addr'), locNightAddr: document.getElementById('loc-night-addr'),
             routeSuggestion: document.getElementById('route-suggestion'), routeSteps: document.getElementById('route-steps'), routeTotal: document.getElementById('route-total'), tripTimer: document.getElementById('trip-timer'),
-            btnAdminSwitch: document.getElementById('btn-admin-switch')
+            btnAdminSwitch: document.getElementById('btn-admin-switch'),
+            // Summary Elements
+            summaryOverlay: document.getElementById('trip-summary-overlay'),
+            sumId: document.getElementById('sum-id'), sumDate: document.getElementById('sum-date'), sumDriver: document.getElementById('sum-driver'), sumVehicle: document.getElementById('sum-vehicle'), sumStartOdo: document.getElementById('sum-start-odo'), sumEndOdo: document.getElementById('sum-end-odo'), sumTotalKm: document.getElementById('sum-total-km'), sumCalcKm: document.getElementById('sum-calc-km'), sumTimeline: document.getElementById('sum-timeline')
         };
 
         // --- HELPERS ---
@@ -538,7 +607,11 @@
 
         // --- APP LOGIC ---
         window.app = {
-            showView: (viewId) => { els.views.forEach(id => document.getElementById(id).classList.toggle('hide', id !== viewId)); lucide.createIcons(); },
+            showView: (viewId) => { els.views.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.toggle('hide', id !== viewId);
+            }); lucide.createIcons(); },
+            
             showToast: (msg) => { els.toastMsg.innerText = msg; els.toast.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => els.toast.classList.add('opacity-0', 'pointer-events-none'), 3000); },
             
             // Standard Confirm Modal
@@ -570,6 +643,51 @@
 
             closeModal: () => { els.modal.classList.add('hide'); state.pendingAction = null; els.modalContent.innerHTML = ''; els.modalInputContainer.classList.add('hide'); },
             
+            // TRIP SUMMARY
+            showTripSummary: (trip, endOdo, calcDist) => {
+                els.sumId.innerText = `ID: #${trip.tripIdDisplay || trip.id.substr(0,8)}`;
+                els.sumDate.innerText = new Date().toLocaleString();
+                els.sumDriver.innerText = trip.driverName;
+                els.sumVehicle.innerText = trip.vehicle;
+                els.sumStartOdo.innerText = trip.startOdo;
+                els.sumEndOdo.innerText = endOdo;
+                const total = endOdo - trip.startOdo;
+                els.sumTotalKm.innerText = `${total} km`;
+                els.sumCalcKm.innerText = `System Est: ${calcDist} km`;
+                
+                // Build Timeline Log
+                let timelineHtml = `
+                    <div class="flex gap-2 items-start"><div class="w-2 h-2 rounded-full bg-cyan-500 mt-1"></div><div class="text-xs"><span class="font-bold text-slate-800">Started</span> <span class="text-slate-500">${new Date(trip.startTime).toLocaleTimeString()}</span><br><span class="text-[10px] text-slate-400">${trip.startLocation}</span></div></div>
+                `;
+                
+                // Passengers / Pickups
+                if(trip.stops && trip.stops.length > 1) {
+                    trip.stops.forEach(stop => {
+                        if(stop.type !== 'start' && stop.type !== 'end') {
+                            timelineHtml += `<div class="flex gap-2 items-start"><div class="w-2 h-2 rounded-full ${stop.type==='pickup'?'bg-emerald-500':'bg-orange-500'} mt-1"></div><div class="text-xs"><span class="font-bold text-slate-800">${stop.desc}</span> <span class="text-slate-500">${new Date(stop.time).toLocaleTimeString()}</span></div></div>`;
+                        }
+                    });
+                }
+                
+                timelineHtml += `<div class="flex gap-2 items-start"><div class="w-2 h-2 rounded-full bg-red-500 mt-1"></div><div class="text-xs"><span class="font-bold text-slate-800">Ended</span> <span class="text-slate-500">${new Date().toLocaleTimeString()}</span></div></div>`;
+                
+                els.sumTimeline.innerHTML = timelineHtml;
+                
+                // Hide Driver View, Show Summary
+                document.getElementById('driver-view').classList.add('hide');
+                els.summaryOverlay.classList.remove('hide');
+            },
+            
+            closeSummary: () => {
+                els.summaryOverlay.classList.add('hide');
+                state.activeTrip = null; // Clear local state
+                state.gps = null;
+                document.getElementById('start-odo').value = ''; 
+                document.getElementById('end-odo').value = '';
+                // Refresh main view logic (will go to Idle)
+                window.app.routeUser();
+            },
+
             // AUTH
             showAuth: () => window.app.showView('auth-view'),
             selectLoginRole: (role) => { 
@@ -707,7 +825,10 @@
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         calculatedDist += calcDist(prev.lat, prev.lng, pos.coords.latitude, pos.coords.longitude);
                         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'trips', state.activeTrip.id), { endTime: new Date().toISOString(), endOdo: parseInt(odo), totalKm: parseInt(odo) - state.activeTrip.startOdo, calculatedKm: calculatedDist.toFixed(1), status: 'completed', stops: arrayUnion({ type: 'end', time: new Date().toISOString(), lat: pos.coords.latitude, lng: pos.coords.longitude, desc: 'Ended' }) });
-                        state.gps = null; document.getElementById('start-odo').value = ''; document.getElementById('end-odo').value = ''; window.app.showToast("Duty Ended. Stats Saved.");
+                        
+                        // Show Receipt
+                        window.app.showTripSummary(state.activeTrip, parseInt(odo), calculatedDist.toFixed(1));
+                        
                         setLoading(false);
                     });
                 } catch(e) { setLoading(false); }

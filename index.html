@@ -15,7 +15,8 @@
         body { font-family: system-ui, -apple-system, sans-serif; background-color: #0f172a; color: white; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
         .show { display: block !important; }
-        .bilingual-sub { font-size: 0.75em; opacity: 0.7; display: block; font-weight: normal; margin-top: 2px; }
+        /* Bilingual Text Styling */
+        .kn { font-size: 0.85em; opacity: 0.8; display: block; font-weight: normal; margin-top: 1px; font-family: 'Segoe UI', sans-serif; }
         .tip-text { font-size: 0.65em; color: #94a3b8; font-style: italic; margin-top: 4px; display: block; }
         
         /* Smooth transitions */
@@ -50,18 +51,18 @@
             <div class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">VERIFIED</div>
         </div>
         <div class="space-y-3 text-sm">
-            <div><span class="text-slate-500 text-xs uppercase">Passenger</span><br><span class="font-bold text-lg" id="bp-pname">Name</span></div>
+            <div><span class="text-slate-500 text-xs uppercase">Passenger / ಪ್ರಯಾಣಿಕ</span><br><span class="font-bold text-lg" id="bp-pname">Name</span></div>
             <div class="flex justify-between">
-                <div><span class="text-slate-500 text-xs uppercase">Date</span><br><span class="font-mono font-bold" id="bp-date">DD/MM/YY</span></div>
-                <div class="text-right"><span class="text-slate-500 text-xs uppercase">Time</span><br><span class="font-mono font-bold" id="bp-time">HH:MM</span></div>
+                <div><span class="text-slate-500 text-xs uppercase">Date / ದಿನಾಂಕ</span><br><span class="font-mono font-bold" id="bp-date">DD/MM/YY</span></div>
+                <div class="text-right"><span class="text-slate-500 text-xs uppercase">Time / ಸಮಯ</span><br><span class="font-mono font-bold" id="bp-time">HH:MM</span></div>
             </div>
             <div class="bg-slate-100 p-3 rounded-lg">
                 <div class="flex justify-between mb-1">
-                    <span class="text-slate-500 text-xs">Driver</span>
+                    <span class="text-slate-500 text-xs">Driver / ಚಾಲಕ</span>
                     <span class="font-bold" id="bp-dname">Driver</span>
                 </div>
                 <div class="flex justify-between mb-1">
-                    <span class="text-slate-500 text-xs">Vehicle</span>
+                    <span class="text-slate-500 text-xs">Vehicle / ವಾಹನ</span>
                     <span class="font-bold" id="bp-vehicle">KA-01...</span>
                 </div>
                 <div class="flex justify-between">
@@ -103,25 +104,23 @@
                 <div class="pulse-ring absolute inset-0"></div>
                 <i data-lucide="zap" class="w-6 h-6 text-cyan-400 relative z-10"></i>
             </div>
-            <h3 class="text-cyan-400 font-bold text-lg animate-pulse">Syncing...</h3>
-            <p class="text-slate-500 text-xs mt-1">Updating Fleet Database</p>
+            <h3 class="text-cyan-400 font-bold text-lg animate-pulse">Syncing... / ಸಿಂಕ್ ಆಗುತ್ತಿದೆ...</h3>
+            <p class="text-slate-500 text-xs mt-1">Updating Database / ಡೇಟಾಬೇಸ್ ನವೀಕರಿಸಲಾಗುತ್ತಿದೆ</p>
         </div>
 
         <!-- TRIP SUMMARY RECEIPT -->
         <div id="trip-summary-overlay" class="fixed inset-0 z-[70] hide bg-slate-950 flex flex-col p-6 overflow-y-auto">
             <div class="flex-1 bg-white text-slate-900 rounded-3xl p-6 shadow-2xl relative flex flex-col">
-                <div class="absolute -left-3 top-1/4 w-6 h-6 bg-slate-950 rounded-full"></div>
-                <div class="absolute -right-3 top-1/4 w-6 h-6 bg-slate-950 rounded-full"></div>
-                
                 <div class="text-center border-b-2 border-slate-100 pb-4 mb-4">
                     <h2 class="text-2xl font-black text-slate-800 tracking-tight">TRIP RECEIPT</h2>
+                    <span class="text-xs text-slate-500 block">ಪ್ರಯಾಣ ರಶೀದಿ</span>
                     <p class="text-xs text-slate-400 font-mono mt-1" id="sum-id">ID: #---</p>
                     <p class="text-xs text-slate-400 font-mono" id="sum-date">---</p>
                 </div>
                 <div class="space-y-5 flex-1">
                     <div class="flex justify-between items-end">
-                        <div><p class="text-[10px] text-slate-400 uppercase font-bold">Driver</p><p class="font-bold text-lg leading-none" id="sum-driver">---</p></div>
-                        <div class="text-right"><p class="text-[10px] text-slate-400 uppercase font-bold">Vehicle</p><p class="font-bold text-lg leading-none" id="sum-vehicle">---</p></div>
+                        <div><p class="text-[10px] text-slate-400 uppercase font-bold">Driver / ಚಾಲಕ</p><p class="font-bold text-lg leading-none" id="sum-driver">---</p></div>
+                        <div class="text-right"><p class="text-[10px] text-slate-400 uppercase font-bold">Vehicle / ವಾಹನ</p><p class="font-bold text-lg leading-none" id="sum-vehicle">---</p></div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                         <div class="flex justify-between mb-2 text-sm"><span class="text-slate-500">Start Odo</span><span class="font-mono font-bold" id="sum-start-odo">---</span></div>
@@ -130,18 +129,17 @@
                         <div class="flex justify-between text-xl items-end"><span class="font-bold text-slate-700">Total KM</span><span class="font-black text-slate-900" id="sum-total-km">0.0</span></div>
                         <p class="text-[10px] text-right text-emerald-600 mt-1 font-medium" id="sum-calc-km">System Est: 0.0 km</p>
                     </div>
-                    <div><p class="text-[10px] text-slate-400 uppercase font-bold mb-2">Trip Log</p><div class="border-l-2 border-slate-200 ml-1 pl-4 space-y-3" id="sum-timeline"></div></div>
+                    <div><p class="text-[10px] text-slate-400 uppercase font-bold mb-2">Trip Log / ಟ್ರಿಪ್ ಲಾಗ್</p><div class="border-l-2 border-slate-200 ml-1 pl-4 space-y-3" id="sum-timeline"></div></div>
                 </div>
-                <div class="mt-6 pt-4 border-t-2 border-slate-100 text-center"><p class="text-[10px] text-slate-400 uppercase">CabSight Verified Record</p></div>
             </div>
-            <button onclick="window.app.closeSummary()" class="mt-4 w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform"><i data-lucide="check-circle" class="inline w-5 h-5 mr-2"></i> Done / Close</button>
+            <button onclick="window.app.closeSummary()" class="mt-4 w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-transform"><i data-lucide="check-circle" class="inline w-5 h-5 mr-2"></i> Done / ಮುಚ್ಚಿ</button>
         </div>
 
         <!-- IMAGE PREVIEW MODAL -->
         <div id="image-modal-overlay" class="fixed inset-0 z-[80] hide bg-black/95 flex flex-col items-center justify-center p-6">
-            <h3 class="text-white font-bold mb-4">Long Press Image to Share/Save</h3>
-            <div id="image-preview-container" class="bg-white rounded-xl overflow-hidden shadow-2xl mb-6"></div>
-            <button onclick="document.getElementById('image-modal-overlay').classList.add('hide')" class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold border border-slate-700">Close</button>
+            <h3 class="text-white font-bold mb-1 text-center">Long Press to Share <span class="kn text-white/70">ಹಂಚಿಕೊಳ್ಳಲು ಲಾಂಗ್ ಪ್ರೆಸ್ ಮಾಡಿ</span></h3>
+            <div id="image-preview-container" class="bg-white rounded-xl overflow-hidden shadow-2xl mb-6 mt-4"></div>
+            <button onclick="document.getElementById('image-modal-overlay').classList.add('hide')" class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold border border-slate-700">Close / ಮುಚ್ಚಿ</button>
         </div>
 
         <!-- UNIVERSAL MODAL (Confirm / Input / Select) -->
@@ -149,7 +147,7 @@
             <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl transform scale-100 transition-transform">
                 <div class="mb-4">
                     <h3 id="modal-title" class="text-lg font-bold text-white">Action</h3>
-                    <p id="modal-desc" class="text-sm text-slate-400 mt-1">Details here</p>
+                    <p id="modal-desc" class="text-sm text-slate-400 mt-1 kn">Details here</p>
                 </div>
                 
                 <!-- Input Field -->
@@ -162,8 +160,8 @@
                 <div id="modal-content" class="mb-4"></div>
                 
                 <div class="flex gap-3" id="modal-actions">
-                    <button onclick="window.app.closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold">Cancel</button>
-                    <button id="modal-confirm-btn" class="flex-1 py-3 rounded-xl bg-cyan-600 text-black font-bold shadow-lg">Confirm</button>
+                    <button onclick="window.app.closeModal()" class="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-bold">Cancel <span class="kn">ರದ್ದು</span></button>
+                    <button id="modal-confirm-btn" class="flex-1 py-3 rounded-xl bg-cyan-600 text-black font-bold shadow-lg">Confirm <span class="kn text-black/70">ಖಚಿತಪಡಿಸಿ</span></button>
                 </div>
             </div>
         </div>
@@ -172,18 +170,18 @@
         <div id="loading-view" class="view-section h-screen flex flex-col items-center justify-center text-center p-6">
             <h1 class="text-4xl font-black mb-4">Cab<span class="text-cyan-400">Sight</span></h1>
             <div class="loader mb-4"></div>
-            <p class="text-slate-400 text-sm">Initializing System...<br><span class="bilingual-sub">ವ್ಯವಸ್ಥೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ...</span></p>
-            <p id="loading-error" class="text-red-400 text-xs mt-4 hide">Connection taking too long...</p>
+            <p class="text-slate-400 text-sm">Initializing...<br><span class="bilingual-sub">ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ...</span></p>
+            <p id="loading-error" class="text-red-400 text-xs mt-4 hide">Connection Slow / ಸಂಪರ್ಕ ನಿಧಾನವಾಗಿದೆ...</p>
         </div>
 
         <!-- AUTH ROLE SELECTION -->
         <div id="auth-view" class="view-section hide flex-1 flex flex-col items-center justify-center p-6 space-y-4">
             <div class="text-center mb-6"><h1 class="text-5xl font-black tracking-tighter">Cab<span class="text-cyan-400">Sight</span></h1><p class="text-slate-400 mt-2">Logistics Management<br><span class="bilingual-sub">ಸಾರಿಗೆ ನಿರ್ವಹಣೆ</span></p></div>
             <button onclick="window.app.selectLoginRole('driver')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-cyan-500 flex items-center gap-4 transition-all active:scale-95 text-left group"><div class="bg-cyan-900/30 p-3 rounded-full text-cyan-400 group-hover:scale-110 transition-transform"><i data-lucide="car"></i></div><div><h3 class="font-bold text-lg">Driver Login</h3><span class="bilingual-sub">ಚಾಲಕರ ಲಾಗಿನ್</span></div></button>
-            <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95 text-left group"><div class="bg-purple-900/30 p-3 rounded-full text-purple-400 group-hover:scale-110 transition-transform"><i data-lucide="users"></i></div><div><h3 class="font-bold text-lg">Staff Login</h3><span class="bilingual-sub">ಸಿಬ್ಬಂದಿ ಲಾಗಿನ್ (Includes Managers)</span></div></button>
-            <button onclick="window.app.selectLoginRole('admin')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500 flex items-center gap-4 transition-all active:scale-95"><div class="bg-emerald-900/30 p-3 rounded-full text-emerald-400"><i data-lucide="shield"></i></div><div class="text-left"><h3 class="font-bold text-lg">Admin Panel</h3><span class="bilingual-sub">ನಿರ್ವಾಹಕರು (ವ್ಯವಸ್ಥಾಪಕರು)</span></div></button>
+            <button onclick="window.app.selectLoginRole('employee')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-purple-500 flex items-center gap-4 transition-all active:scale-95 text-left group"><div class="bg-purple-900/30 p-3 rounded-full text-purple-400 group-hover:scale-110 transition-transform"><i data-lucide="users"></i></div><div><h3 class="font-bold text-lg">Staff Login</h3><span class="bilingual-sub">ಸಿಬ್ಬಂದಿ ಲಾಗಿನ್</span></div></button>
+            <button onclick="window.app.selectLoginRole('admin')" class="w-full bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-emerald-500 flex items-center gap-4 transition-all active:scale-95"><div class="bg-emerald-900/30 p-3 rounded-full text-emerald-400"><i data-lucide="shield"></i></div><div class="text-left"><h3 class="font-bold text-lg">Admin Panel</h3><span class="bilingual-sub">ನಿರ್ವಾಹಕರು</span></div></button>
             <div class="w-full h-px bg-slate-800 my-4"></div>
-            <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2"><i data-lucide="user-plus"></i> Register New User / ಹೊಸ ಬಳಕೆದಾರ</button>
+            <button onclick="window.app.showOnboarding()" class="w-full border-2 border-slate-700 p-4 rounded-2xl text-slate-300 font-bold hover:bg-slate-800 flex justify-center items-center gap-2"><i data-lucide="user-plus"></i> Register New User <span class="kn inline ml-1">ಹೊಸ ನೋಂದಣಿ</span></button>
         </div>
 
         <!-- LOGIN & PIN VIEW -->
@@ -191,9 +189,9 @@
             <button onclick="window.app.showAuth()" class="absolute top-16 left-6 p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><i data-lucide="arrow-left"></i></button>
             <div class="text-center mb-8"><div id="login-icon-container" class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4 text-cyan-400"><i data-lucide="lock" class="w-8 h-8"></i></div><h2 id="login-title" class="text-2xl font-bold">Login</h2><p class="text-slate-400 text-sm">Enter Credentials / ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ</p></div>
             <div class="space-y-4">
-                <div><label class="text-xs text-slate-400 uppercase font-bold ml-1">Phone Number (ID)</label><input type="tel" id="login-id" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-lg focus:border-cyan-500 outline-none" placeholder="Enter Phone"><span class="tip-text">Registered Mobile Number / ನೋಂದಾಯಿತ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</span></div>
-                <div><label class="text-xs text-slate-400 uppercase font-bold ml-1">4-Digit PIN</label><input type="password" id="login-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••"><span class="tip-text">Secret Security PIN / ರಹಸ್ಯ ಭದ್ರತಾ ಪಿನ್</span></div>
-                <button onclick="window.app.submitLogin()" id="btn-login-submit" class="w-full bg-cyan-600 text-black font-bold p-4 rounded-xl shadow-lg mt-6 flex justify-center items-center gap-2"><i data-lucide="log-in"></i> Secure Login</button>
+                <div><label class="text-xs text-slate-400 uppercase font-bold ml-1">Phone Number / ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label><input type="tel" id="login-id" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-lg focus:border-cyan-500 outline-none" placeholder="Enter Phone"></div>
+                <div><label class="text-xs text-slate-400 uppercase font-bold ml-1">4-Digit PIN / ಪಿನ್ ಸಂಖ್ಯೆ</label><input type="password" id="login-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••"></div>
+                <button onclick="window.app.submitLogin()" id="btn-login-submit" class="w-full bg-cyan-600 text-black font-bold p-4 rounded-xl shadow-lg mt-6 flex justify-center items-center gap-2"><i data-lucide="log-in"></i> Secure Login / ಲಾಗಿನ್</button>
             </div>
         </div>
 
@@ -201,68 +199,53 @@
         <div id="onboarding-view" class="view-section hide flex-1 p-6 bg-slate-900 flex flex-col justify-center">
             <h2 class="text-2xl font-bold mb-6">Setup Profile <span class="bilingual-sub">ಪ್ರೊಫೈಲ್ ರಚಿಸಿ</span></h2>
             <div class="space-y-4 overflow-y-auto max-h-[80vh] pb-10">
-                <div><label class="text-xs text-slate-400 uppercase">Full Name</label><input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. Raju Kumar"></div>
-                <div><label class="text-xs text-slate-400 uppercase">Phone (Login ID)</label><input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. 9876543210"></div>
-                <div><label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN</label><input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••"></div>
-                <div><label class="text-xs text-slate-400 uppercase">Category / ವರ್ಗ</label><div class="grid grid-cols-2 gap-3 mt-1"><button onclick="window.app.selectRegRole('driver')" id="btn-role-driver" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2"><i data-lucide="car"></i> Driver</button><button onclick="window.app.selectRegRole('staff')" id="btn-role-staff" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2"><i data-lucide="briefcase"></i> Staff</button></div></div>
+                <div><label class="text-xs text-slate-400 uppercase">Full Name / ಪೂರ್ಣ ಹೆಸರು</label><input type="text" id="reg-name" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. Raju Kumar"></div>
+                <div><label class="text-xs text-slate-400 uppercase">Phone / ಮೊಬೈಲ್ ಸಂಖ್ಯೆ</label><input type="tel" id="reg-phone" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 focus:border-cyan-500 outline-none" placeholder="e.g. 9876543210"></div>
+                <div><label class="text-xs text-slate-400 uppercase font-bold text-cyan-400">Set 4-Digit PIN / ಪಿನ್ ಸೆಟ್ ಮಾಡಿ</label><input type="password" id="reg-pin" maxlength="4" inputmode="numeric" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 mt-1 text-center text-2xl tracking-widest focus:border-cyan-500 outline-none" placeholder="••••"></div>
+                <div id="reg-locations-section" class="hide border border-slate-700 rounded-xl p-4 bg-slate-800/50">
+                    <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="map-pin"></i> Preferred Locations / ಆದ್ಯತೆಯ ಸ್ಥಳಗಳು</h3>
+                    <div class="space-y-3">
+                        <div class="flex gap-2"><input type="text" id="loc-day-addr" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg" placeholder="Day Pickup (e.g. Home)" readonly><button onclick="window.app.captureProfileLoc('day')" class="bg-yellow-600/20 text-yellow-500 p-2 rounded-lg border border-yellow-600/50"><i data-lucide="sun"></i></button></div>
+                        <div class="flex gap-2"><input type="text" id="loc-night-addr" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg" placeholder="Night Pickup (e.g. Relative)" readonly><button onclick="window.app.captureProfileLoc('night')" class="bg-indigo-600/20 text-indigo-400 p-2 rounded-lg border border-indigo-600/50"><i data-lucide="moon"></i></button></div>
+                        <p class="text-[10px] text-slate-500 italic">Tap icon to capture current GPS / ಪ್ರಸ್ತುತ ಸ್ಥಳವನ್ನು ಉಳಿಸಲು ಐಕಾನ್ ಟ್ಯಾಪ್ ಮಾಡಿ</p>
+                    </div>
+                </div>
+                <div><label class="text-xs text-slate-400 uppercase">Category / ವರ್ಗ</label><div class="grid grid-cols-2 gap-3 mt-1"><button onclick="window.app.selectRegRole('driver')" id="btn-role-driver" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2"><i data-lucide="car"></i> Driver / ಚಾಲಕ</button><button onclick="window.app.selectRegRole('staff')" id="btn-role-staff" class="p-4 rounded-xl border border-slate-700 text-slate-500 flex flex-col items-center gap-2"><i data-lucide="briefcase"></i> Staff / ಸಿಬ್ಬಂದಿ</button></div></div>
                 <div id="reg-driver-fields" class="hide space-y-4"><input type="text" id="reg-vehicle" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Vehicle Model"><input type="text" id="reg-plate" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none" placeholder="Plate No"></div>
                 <div id="reg-staff-fields" class="hide"><label class="text-xs text-slate-400 uppercase mb-1 block">Designation / ಹುದ್ದೆ</label><select id="reg-designation" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 outline-none text-white"><option value="Ground Coordinator">Ground Coordinator</option><option value="Process Executive">Process Executive</option><option value="Team Leader">Team Leader</option><option value="Manager">Manager (Admin)</option><option value="Senior Manager">Senior Manager (Admin)</option><option value="Director">Director (Admin)</option></select></div>
-                <div class="flex gap-3 mt-6"><button onclick="window.app.showAuth()" class="flex-1 p-4 rounded-xl bg-slate-800 text-slate-400 font-bold">Cancel</button><button onclick="window.app.completeRegistration()" class="flex-[2] p-4 rounded-xl bg-cyan-600 text-black font-bold shadow-lg shadow-cyan-900/50">Register</button></div>
+                <div class="flex gap-3 mt-6"><button onclick="window.app.showAuth()" class="flex-1 p-4 rounded-xl bg-slate-800 text-slate-400 font-bold">Cancel / ರದ್ದು</button><button onclick="window.app.completeRegistration()" class="flex-[2] p-4 rounded-xl bg-cyan-600 text-black font-bold shadow-lg shadow-cyan-900/50">Register / ನೋಂದಣಿ</button></div>
             </div>
         </div>
 
-        <!-- PROFILE VIEW (NEW) -->
-        <div id="profile-view" class="view-section hide flex-1 flex flex-col p-6 bg-slate-950 overflow-y-auto">
-             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">My Profile <span class="bilingual-sub">ನನ್ನ ವಿವರಗಳು</span></h2>
-                <button onclick="window.app.closeProfile()" class="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"><i data-lucide="x"></i></button>
-            </div>
-            <div class="space-y-6">
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                    <div class="flex items-center gap-4 mb-4">
-                         <div class="w-16 h-16 rounded-full bg-cyan-900 flex items-center justify-center text-2xl font-bold text-cyan-400" id="prof-avatar">U</div>
-                         <div><p class="font-bold text-lg" id="prof-name">User Name</p><p class="text-xs text-slate-500" id="prof-role">Role</p></div>
-                    </div>
-                    <div class="space-y-3">
-                        <div><label class="text-xs text-slate-500 uppercase">Phone</label><input id="prof-phone" type="text" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm mt-1" readonly></div>
-                        <div><label class="text-xs text-slate-500 uppercase">PIN</label><input id="prof-pin" type="text" maxlength="4" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm mt-1"></div>
-                        <div id="prof-vehicle-wrap" class="hide"><label class="text-xs text-slate-500 uppercase">Vehicle</label><input id="prof-vehicle" type="text" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm mt-1"></div>
-                    </div>
+        <!-- PROFILE VIEW -->
+        <div id="view-profile" class="fixed inset-0 z-[80] hide bg-slate-950 flex flex-col p-6">
+            <div class="flex justify-between items-center mb-8"><h2 class="text-2xl font-bold">Profile <span class="kn">ವಿವರಗಳು</span></h2><button onclick="window.app.closeProfile()" class="bg-slate-800 p-2 rounded-full"><i data-lucide="x"></i></button></div>
+            <div class="space-y-4">
+                <div><label class="text-xs text-slate-500 uppercase">Update PIN / ಪಿನ್ ಬದಲಾಯಿಸಿ</label><input id="prof-pin" type="text" maxlength="4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white text-center tracking-widest font-mono"></div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-500 uppercase mb-2">Quick Locations / ಸ್ಥಳಗಳು</p>
+                    <div class="flex gap-2 mb-2"><button onclick="window.app.captureProfileLoc('day', true)" class="bg-slate-800 text-yellow-500 p-3 rounded-lg flex-1 text-xs border border-slate-700"><i data-lucide="sun" class="w-4 h-4 mx-auto mb-1"></i> Update Day Loc</button><button onclick="window.app.captureProfileLoc('night', true)" class="bg-slate-800 text-indigo-400 p-3 rounded-lg flex-1 text-xs border border-slate-700"><i data-lucide="moon" class="w-4 h-4 mx-auto mb-1"></i> Update Night Loc</button></div>
+                    <p id="prof-loc-status" class="text-[10px] text-slate-600 text-center">Tap to overwrite with current GPS</p>
                 </div>
-                
-                <div id="prof-locations-section" class="hide">
-                    <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="map-pin"></i> Saved Locations</h3>
-                    <div class="space-y-3">
-                         <div class="flex gap-2">
-                            <input type="text" id="prof-loc-day" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg border border-slate-800" placeholder="Day Pickup (e.g. Home)" readonly>
-                            <button onclick="window.app.captureProfileLoc('day', true)" class="bg-yellow-600/20 text-yellow-500 p-2 rounded-lg border border-yellow-600/50"><i data-lucide="sun"></i></button>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="text" id="prof-loc-night" class="flex-1 bg-slate-900 text-xs p-3 rounded-lg border border-slate-800" placeholder="Night Pickup (e.g. Relative)" readonly>
-                            <button onclick="window.app.captureProfileLoc('night', true)" class="bg-indigo-600/20 text-indigo-400 p-2 rounded-lg border border-indigo-600/50"><i data-lucide="moon"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="window.app.saveProfile()" class="w-full bg-cyan-600 text-black font-bold py-4 rounded-xl shadow-lg mt-4">Save Changes</button>
+                <button onclick="window.app.saveProfile()" class="w-full bg-cyan-600 text-black font-bold py-4 rounded-xl mt-4">Save Changes / ಉಳಿಸಿ</button>
             </div>
         </div>
 
         <!-- PENDING APPROVAL VIEW -->
         <div id="pending-view" class="view-section hide flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <div class="bg-yellow-900/20 p-6 rounded-full mb-4 text-yellow-500"><i data-lucide="clock" class="w-12 h-12"></i></div><h2 class="text-2xl font-bold mb-2">Registration Pending</h2><p class="text-slate-400">Your account is waiting for Manager approval.<br>Please contact your supervisor.</p><button onclick="window.app.promptLogout()" class="mt-8 text-slate-500 hover:text-white">Go Back</button>
+            <div class="bg-yellow-900/20 p-6 rounded-full mb-4 text-yellow-500"><i data-lucide="clock" class="w-12 h-12"></i></div><h2 class="text-2xl font-bold mb-2">Registration Pending</h2><p class="text-slate-400">Waiting for Admin approval.<br><span class="kn">ಅನುಮೋದನೆಗಾಗಿ ನಿರೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ.</span></p><button onclick="window.app.promptLogout()" class="mt-8 text-slate-500 hover:text-white">Go Back</button>
         </div>
 
         <!-- DRIVER DASHBOARD -->
         <div id="driver-view" class="view-section hide min-h-screen bg-black pb-24 overflow-y-auto">
             <header class="bg-slate-900 p-4 sticky top-0 z-20 border-b border-slate-800 flex justify-between items-center"><div class="flex items-center gap-3"><div id="d-avatar" class="w-10 h-10 rounded-full bg-cyan-900 border border-cyan-500 flex items-center justify-center font-bold text-cyan-400 cursor-pointer" onclick="window.app.openProfile()">D</div><div><h2 id="d-name" class="font-bold text-sm cursor-pointer" onclick="window.app.openProfile()">Driver</h2><p id="d-vehicle" class="text-xs text-slate-400">Vehicle</p></div></div><button onclick="window.app.promptLogout()" class="bg-slate-800 p-2 rounded-full"><i data-lucide="log-out" class="w-4 h-4"></i></button></header>
             <div class="p-4 space-y-6">
-                <div id="driver-requests" class="space-y-4"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Pickup Requests</h3><div id="requests-list" class="space-y-3"></div></div>
-                <div id="route-suggestion" class="hide bg-slate-900 p-4 rounded-xl border border-slate-700"><h3 class="text-sm font-bold text-emerald-400 mb-2 flex items-center gap-2"><i data-lucide="map"></i> Suggested Route</h3><div id="route-steps" class="text-xs text-slate-300 space-y-2 font-mono"></div><div id="route-total" class="mt-3 pt-2 border-t border-slate-800 text-xs font-bold text-right text-slate-400"></div></div>
-                <div id="driver-idle" class="space-y-6"><div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-center"><h2 class="text-xl font-bold mb-1">Start New Shift</h2><span class="bilingual-sub mb-6">ಹೊಸ ಶಿಫ್ಟ್ ಪ್ರಾರಂಭಿಸಿ</span><div class="space-y-4 text-left"><div><label class="text-xs text-slate-400">START ODOMETER</label><input type="number" id="start-odo" class="w-full bg-slate-800 rounded-xl p-3 text-2xl font-mono border border-slate-700 focus:border-cyan-500 outline-none" placeholder="00000"><span class="tip-text">Enter current reading</span></div><div id="gps-status" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500 mt-2 cursor-pointer" onclick="window.app.getGPSLocation()"><i data-lucide="crosshair"></i><span class="text-xs">Tap to Fetch GPS</span></div></div><button onclick="window.app.confirmAction('Start Duty?', 'This will begin your GPS log.', window.app.startTrip)" id="btn-start-trip" class="w-full mt-6 bg-slate-800 text-slate-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all" disabled><i data-lucide="navigation"></i> START DUTY</button></div></div>
+                <div id="driver-requests" class="space-y-4"><h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bell" class="w-3 h-3 text-cyan-400"></i> Requests / ವಿನಂತಿಗಳು</h3><div id="requests-list" class="space-y-3"></div></div>
+                <div id="route-suggestion" class="hide bg-slate-900 p-4 rounded-xl border border-slate-700"><h3 class="text-sm font-bold text-emerald-400 mb-2 flex items-center gap-2"><i data-lucide="map"></i> Route / ಮಾರ್ಗ</h3><div id="route-steps" class="text-xs text-slate-300 space-y-2 font-mono"></div><div id="route-total" class="mt-3 pt-2 border-t border-slate-800 text-xs font-bold text-right text-slate-400"></div></div>
+                <div id="driver-idle" class="space-y-6"><div class="bg-slate-900 rounded-3xl p-6 border border-slate-800 text-center"><h2 class="text-xl font-bold mb-1">Start New Shift</h2><span class="bilingual-sub mb-6">ಹೊಸ ಶಿಫ್ಟ್ ಪ್ರಾರಂಭಿಸಿ</span><div class="space-y-4 text-left"><div><label class="text-xs text-slate-400">START ODOMETER</label><input type="number" id="start-odo" class="w-full bg-slate-800 rounded-xl p-3 text-2xl font-mono border border-slate-700 focus:border-cyan-500 outline-none" placeholder="00000"><span class="tip-text">Enter current reading / ಪ್ರಸ್ತುತ ರೀಡಿಂಗ್ ನಮೂದಿಸಿ</span></div><div id="gps-status" class="p-4 rounded-xl border border-slate-700 bg-slate-800 flex flex-col items-center justify-center gap-2 text-slate-500 mt-2 cursor-pointer" onclick="window.app.getGPSLocation()"><i data-lucide="crosshair"></i><span class="text-xs">Tap to Fetch GPS</span></div></div><button onclick="window.app.confirmAction('Start Duty?', 'Begin GPS log / GPS ಲಾಗ್ ಪ್ರಾರಂಭಿಸಿ', window.app.startTrip)" id="btn-start-trip" class="w-full mt-6 bg-slate-800 text-slate-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all" disabled><i data-lucide="navigation"></i> START DUTY / ಪ್ರಾರಂಭಿಸಿ</button></div></div>
                 <div id="driver-active" class="hide space-y-6">
-                    <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 border border-emerald-800 relative overflow-hidden shadow-xl"><div class="absolute top-4 right-4 animate-pulse"><div class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]"></div></div><span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE</span><h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00:00</h1><p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1 font-mono break-words leading-tight"><i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> Locating...</p></div>
-                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800"><div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-800"><i data-lucide="activity" class="w-4 h-4 text-slate-400"></i><span class="text-sm font-bold text-slate-300">Live Timeline</span></div><div id="trip-timeline" class="space-y-4 pl-2 border-l border-slate-800 ml-2"></div></div>
+                    <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 border border-emerald-800 relative overflow-hidden shadow-xl"><div class="absolute top-4 right-4 animate-pulse"><div class="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_#10b981]"></div></div><span class="text-emerald-400 text-xs font-bold tracking-widest">TRIP ACTIVE / ಚಾಲನೆಯಲ್ಲಿದೆ</span><h1 id="trip-timer" class="text-4xl font-mono font-bold text-white mt-2">00:00:00</h1><p id="trip-start-loc" class="text-xs text-emerald-200/60 mt-2 flex items-center gap-1 font-mono break-words leading-tight"><i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i> Locating...</p></div>
+                    <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800"><div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-800"><i data-lucide="activity" class="w-4 h-4 text-slate-400"></i><span class="text-sm font-bold text-slate-300">Timeline / ಟೈಮ್‌ಲೈನ್</span></div><div id="trip-timeline" class="space-y-4 pl-2 border-l border-slate-800 ml-2"></div></div>
                     <div class="bg-slate-900 rounded-3xl p-6 border border-slate-800"><label class="text-xs text-slate-400">END ODOMETER</label><div class="flex gap-3 mt-2"><input type="number" id="end-odo" class="flex-1 bg-slate-800 rounded-xl p-3 text-xl font-mono border border-slate-700 outline-none" placeholder="00000"><button onclick="window.app.tryEndTrip()" class="bg-red-600 px-6 rounded-xl text-white shadow-lg active:scale-95"><i data-lucide="check-circle"></i></button></div></div>
                 </div>
             </div>
@@ -274,17 +257,17 @@
             <div class="p-4 space-y-6 max-w-lg mx-auto">
                 <div id="employee-request-ui" class="bg-white p-6 rounded-3xl border border-blue-100 shadow-md">
                     <div id="req-idle">
-                        <h3 class="font-bold text-lg text-slate-800 mb-2">Need a Ride?</h3>
+                        <h3 class="font-bold text-lg text-slate-800 mb-2">Need a Ride? <span class="kn">ಸವಾರಿ ಬೇಕೇ?</span></h3>
                         <p class="text-xs text-slate-500 mb-4">Request a cab to your location.</p>
-                        <button onclick="window.app.initiatePickupRequest()" id="btn-request-pickup" class="w-full bg-blue-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"><i data-lucide="map-pin"></i> Request Pickup</button>
+                        <button onclick="window.app.initiatePickupRequest()" id="btn-request-pickup" class="w-full bg-blue-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"><i data-lucide="map-pin"></i> Request Pickup / ಪಿಕಪ್ ವಿನಂತಿಸಿ</button>
                     </div>
-                    <div id="req-pending" class="hide text-center py-6"><div class="loader mx-auto border-blue-200 border-t-blue-600 mb-4"></div><h3 class="font-bold text-slate-800">Finding a Driver...</h3><p class="text-xs text-slate-500 mt-1">Please wait</p></div>
+                    <div id="req-pending" class="hide text-center py-6"><div class="loader mx-auto border-blue-200 border-t-blue-600 mb-4"></div><h3 class="font-bold text-slate-800">Finding Driver...</h3><p class="text-xs text-slate-500 mt-1 kn">ಚಾಲಕನನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ...</p></div>
                     <div id="req-accepted" class="hide bg-green-50 p-4 rounded-xl border border-green-200">
                         <div class="flex items-center justify-between mb-3 border-b border-green-200 pb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-bold"><i data-lucide="check"></i></div><div><h3 class="font-bold text-green-800 text-sm" id="req-status-text">Cab Arriving!</h3><p class="text-xs text-green-600" id="req-driver-name">Driver Name</p></div></div><a id="req-call-btn" href="#" class="bg-white p-2 rounded-full shadow text-green-600"><i data-lucide="phone"></i></a></div>
                         <div class="text-xs text-slate-500 flex gap-2 mb-2 items-center"><i data-lucide="navigation" class="w-4 h-4 text-slate-400"></i><span id="req-driver-loc" class="font-mono">Driver Location...</span></div>
-                        <div id="req-wait-timer" class="text-xs font-bold text-orange-600 mb-4 hide">Driver waiting for 0m</div>
-                        <div id="req-boarding-ui" class="hide border-t border-green-200 pt-4 mt-2"><p class="text-xs font-bold text-slate-600 mb-2 text-center">Driver is here!</p><button onclick="window.app.handleBoardingClick()" class="w-full bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95"><i data-lucide="log-in"></i> CONFIRM BOARDING</button></div>
-                        <div id="req-waiting-ui" class="grid grid-cols-1 gap-2"><button onclick="window.app.refreshDriverLoc()" class="bg-white border border-green-200 text-green-700 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95"><i data-lucide="refresh-cw"></i> Refresh Location</button></div>
+                        <div id="req-wait-timer" class="text-xs font-bold text-orange-600 mb-4 hide">Driver waiting...</div>
+                        <div id="req-boarding-ui" class="hide border-t border-green-200 pt-4 mt-2"><p class="text-xs font-bold text-slate-600 mb-2 text-center">Driver is here!</p><button onclick="window.app.handleBoardingClick()" class="w-full bg-green-600 text-white py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95"><i data-lucide="log-in"></i> CONFIRM BOARDING / ಹತ್ತಿದ್ದೇನೆ</button></div>
+                        <div id="req-waiting-ui" class="grid grid-cols-1 gap-2"><button onclick="window.app.refreshDriverLoc()" class="bg-white border border-green-200 text-green-700 py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95"><i data-lucide="refresh-cw"></i> Refresh / ರಿಫ್ರೆಶ್</button></div>
                     </div>
                 </div>
                 <div id="employee-idle" class="space-y-4"><h3 class="font-bold text-lg text-slate-700 flex items-center gap-2"><i data-lucide="rss" class="w-4 h-4"></i> Nearby Cabs <span class="bilingual-sub font-normal text-xs ml-1">(ಹತ್ತಿರದ ಕ್ಯಾಬ್‌ಗಳು)</span></h3><div id="cab-list" class="space-y-3 pb-20"></div></div>
@@ -293,8 +276,8 @@
                         <div class="flex justify-between items-start mb-6"><div><p class="text-blue-200 text-xs font-bold mb-1 uppercase">ONBOARD</p><h2 id="onboard-driver" class="text-2xl font-bold">Driver Name</h2><p id="onboard-vehicle" class="opacity-90 text-sm font-mono">Vehicle</p></div><div class="bg-white/20 p-3 rounded-2xl"><i data-lucide="car" class="w-6 h-6 text-white"></i></div></div>
                         <div class="bg-white/10 rounded-xl p-3 mb-4 backdrop-blur-sm"><div class="flex items-center gap-2 text-sm text-blue-100"><i data-lucide="map-pin" class="w-4 h-4"></i><span id="onboard-loc" class="break-words">Boarded at...</span></div></div>
                         <!-- Actions -->
-                        <button onclick="window.app.generateBoardingPass()" class="w-full bg-indigo-500 text-white py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 mb-3 active:scale-95"><i data-lucide="ticket"></i> Generate Boarding Pass</button>
-                        <button onclick="window.app.confirmAction('Drop/Leave Cab?', 'Confirm you have reached destination.', window.app.leaveTrip)" id="btn-leave" class="w-full bg-white text-blue-600 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95"><i data-lucide="map-pin"></i> Drop / Leave</button>
+                        <button onclick="window.app.generateBoardingPass()" class="w-full bg-indigo-500 text-white py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 mb-3 active:scale-95"><i data-lucide="ticket"></i> Boarding Pass / ಪಾಸ್</button>
+                        <button onclick="window.app.confirmAction('Drop/Leave Cab?', 'Confirm you have reached destination / ಇಳಿಯುವುದನ್ನು ಖಚಿತಪಡಿಸಿ.', window.app.leaveTrip)" id="btn-leave" class="w-full bg-white text-blue-600 py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 active:scale-95"><i data-lucide="map-pin"></i> Drop / Leave / ಇಳಿಯಿರಿ</button>
                     </div>
                 </div>
             </div>
@@ -302,7 +285,7 @@
 
         <!-- ADMIN DASHBOARD -->
         <div id="admin-view" class="view-section hide min-h-screen bg-slate-100 text-slate-900 overflow-y-auto">
-            <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 flex justify-between items-center shadow-lg"><div class="flex items-center gap-3"><div class="bg-emerald-500 p-2 rounded-lg"><i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i></div><div><h2 class="font-bold text-sm">Tower Control</h2><span class="text-[10px] text-slate-400 block">Admin Panel</span></div></div><div class="flex gap-2"><button class="text-slate-400" onclick="window.app.openProfile()"><i data-lucide="user" class="w-5 h-5"></i></button><button onclick="window.app.promptLogout()" class="text-slate-400"><i data-lucide="log-out" class="w-5 h-5"></i></button></div></div>
+            <div class="bg-slate-900 text-white p-4 sticky top-0 z-30 flex justify-between items-center shadow-lg"><div class="flex items-center gap-3"><div class="bg-emerald-500 p-2 rounded-lg"><i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i></div><div><h2 class="font-bold text-sm">Tower Control</h2><span class="text-[10px] text-slate-400 block">Admin Panel</span></div></div><button onclick="window.app.promptLogout()" class="text-slate-400"><i data-lucide="log-out" class="w-5 h-5"></i></button></div>
             <div class="bg-white border-b border-slate-200 flex text-sm font-bold text-slate-600"><button onclick="window.app.setAdminTab('trips')" id="tab-trips" class="flex-1 py-3 border-b-2 border-emerald-500 text-emerald-600">Trip Validation</button><button onclick="window.app.setAdminTab('users')" id="tab-users" class="flex-1 py-3 border-b-2 border-transparent hover:text-slate-800">User Mgmt</button></div>
             <div class="p-4 pb-20"><div id="admin-tab-trips"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700">Trip Audits</h3><button onclick="window.app.downloadCSV()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg font-bold flex gap-1 items-center"><i data-lucide="download" class="w-3 h-3"></i> Export CSV</button></div><div id="admin-trip-list" class="space-y-4"></div></div><div id="admin-tab-users" class="hide"><h3 class="font-bold text-slate-700 mb-4">User Management</h3><div id="admin-user-list" class="space-y-3"></div></div></div>
         </div>
@@ -460,7 +443,7 @@
                 localStorage.removeItem('cabsight_mode');
                 window.location.reload(); 
             },
-            promptLogout: () => window.app.confirmAction('Log Out?', 'End current session.', window.app.logout),
+            promptLogout: () => window.app.confirmAction('Log Out? / ನಿರ್ಗಮಿಸುವಿರಾ?', 'End current session / ಸೆಷನ್ ಅಂತ್ಯಗೊಳಿಸಿ', window.app.logout),
             showAuth: () => window.app.showView('auth-view'),
             routeUser: () => {
                 if(!state.user) return window.app.showView('auth-view');
@@ -546,7 +529,7 @@
                     window.app.showToast("Cannot End Trip: Passenger Onboard!");
                     return;
                 }
-                window.app.confirmAction('End Shift?', 'Finalize log.', window.app.endTrip);
+                window.app.confirmAction('End Shift?', 'Finalize log / ಲಾಗ್ ಮುಗಿಸಿ', window.app.endTrip);
             },
             endTrip: async () => {
                 const odo = document.getElementById('end-odo').value; 
@@ -609,7 +592,7 @@
                 if(locs.day) options.push({ label: "☀️ Day Loc", sub: locs.day.address, val1: locs.day.lat, val2: locs.day.lng, val3: locs.day.address, fnName: 'sendReqWithDrop' });
                 if(locs.night) options.push({ label: "🌙 Night Loc", sub: locs.night.address, val1: locs.night.lat, val2: locs.night.lng, val3: locs.night.address, fnName: 'sendReqWithDrop' });
                 
-                window.app.showSelectionModal("Select Drop Point", "Where are you going?", options);
+                window.app.showSelectionModal("Select Drop Point / ಡ್ರಾಪ್ ಆಯ್ಕೆಮಾಡಿ", "Where are you going?", options);
             },
             sendReqWithDrop: async (dLat, dLng, dAddr) => {
                 window.app.closeModal(); setLoading(true);
@@ -637,9 +620,9 @@
                     else {
                         els.reqPending.classList.add('hide'); els.reqAccepted.classList.remove('hide'); els.reqIdle.classList.add('hide');
                         els.reqDriverName.innerText = myReq.driverName; 
-                        
-                        if(myReq.status === 'arrived') {
-                            els.reqStatusText.innerText = "Driver is Here!";
+                        els.reqCallBtn.href = `tel:${myReq.driverPhone}`;
+                        if(myReq.status === 'arrived') { 
+                            els.reqStatusText.innerText = "Driver is Here!"; 
                             els.reqBoardingUi.classList.remove('hide');
                             els.reqWaitingUi.classList.add('hide');
                             // Wait Timer
@@ -648,9 +631,11 @@
                                 els.reqWaitTimer.innerText = `Waiting: ${mins} mins`;
                                 els.reqWaitTimer.classList.remove('hide');
                             }
-                        } else {
-                             els.reqStatusText.innerText = "Cab Arriving"; els.reqBoardingUi.classList.add('hide'); els.reqWaitTimer.classList.add('hide');
+                        } else { 
+                            els.reqStatusText.innerText = "Cab Arriving"; els.reqBoardingUi.classList.add('hide'); els.reqWaitTimer.classList.add('hide'); 
                         }
+                        const driverTrip = state.trips.find(t => t.driverId === myReq.driverId && t.status === 'active');
+                        els.reqDriverLoc.innerText = driverTrip ? driverTrip.startLocation : myReq.driverLoc;
                     }
                 } else {
                     document.getElementById('employee-idle').classList.remove('hide'); document.getElementById('employee-request-ui').classList.remove('hide'); els.reqIdle.classList.remove('hide'); els.reqPending.classList.add('hide'); els.reqAccepted.classList.add('hide'); document.getElementById('employee-onboard').classList.add('hide');
